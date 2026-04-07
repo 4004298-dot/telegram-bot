@@ -295,7 +295,6 @@ def parse_consult(chat_id, lines):
         tm,
         subject,
         lawyer,
-        now_str()
     ]
 
     ws.append_row(row, value_input_option="USER_ENTERED")
