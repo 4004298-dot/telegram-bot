@@ -685,6 +685,7 @@ async function loadData() {
     renderMyTasks();
     renderTeam();
     renderCalendar();
+    if (calSelectedDay) renderCalEvents(calSelectedDay);
   } catch(e) {
     document.getElementById('tasks-body').innerHTML =
       '<div class="empty"><div class="ico">⚠️</div><p>Не удалось загрузить данные</p></div>';
