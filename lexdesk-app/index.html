@@ -563,6 +563,11 @@ function enterApp() {
   navTo('tasks');
   loadData();
   setInterval(loadData, 30000);
+
+  // Когда возвращаемся из фона — сразу обновляем
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') loadData();
+  });
 }
 
 // ════════════════════════════════════
