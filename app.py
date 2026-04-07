@@ -2,6 +2,8 @@ import os
 import json
 import time
 import sqlite3
+import hashlib
+import hmac
 import logging
 from datetime import datetime
 from flask import Flask, request, jsonify, send_file
@@ -26,6 +28,15 @@ TASKS_SHEET = os.environ.get("TASKS_SHEET", "Поручения")
 CONSULTS_SHEET = os.environ.get("CONSULTS_SHEET", "Консультации")
 DONE_SHEET = os.environ.get("DONE_SHEET", "Выполнено")
 GOOGLE_CALENDAR_ID = os.environ.get("GOOGLE_CALENDAR_ID", "")
+
+# Роли: "ADMIN_IDS=111111,222222" — Наталья и Аня
+ADMIN_IDS = set(x.strip() for x in os.environ.get("ADMIN_IDS", "").split(",") if x.strip())
+# Имена: "USER_NAMES=111111:Наталья,222222:Аня,333333:Сергей"
+USER_NAMES = {}
+for pair in os.environ.get("USER_NAMES", "").split(","):
+    if ":" in pair:
+        uid, name = pair.strip().split(":", 1)
+        USER_NAMES[uid.strip()] = name.strip()
 
 BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
@@ -454,6 +465,110 @@ def api_data():
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
     return send_file("dashboard-preview.html")
+
+
+@app.route("/app", methods=["GET"])
+def pwa_app():
+    return send_file("lexdesk-app/index.html")
+
+
+@app.route("/auth/telegram", methods=["GET"])
+def auth_telegram():
+    """Проверяет данные Telegram Login Widget и возвращает роль пользователя."""
+    try:
+        args = request.args.to_dict()
+        check_hash = args.pop("hash", "")
+
+        data_check = "\n".join(f"{k}={v}" for k, v in sorted(args.items()))
+        secret = hashlib.sha256(BOT_TOKEN.encode()).digest()
+        computed = hmac.new(secret, data_check.encode(), hashlib.sha256).hexdigest()
+
+        if not hmac.compare_digest(computed, check_hash):
+            return jsonify({"error": "invalid hash"}), 403
+
+        # Данные верны
+        user_id = str(args.get("id", ""))
+        first_name = args.get("first_name", "")
+        username = args.get("username", "")
+
+        name = USER_NAMES.get(user_id) or first_name or username or "Пользователь"
+        role = "admin" if user_id in ADMIN_IDS else "lawyer"
+
+        return jsonify({"ok": True, "user_id": user_id, "name": name, "role": role})
+
+    except Exception as e:
+        app.logger.exception("auth_telegram error")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/submit", methods=["POST"])
+def api_submit():
+    """Добавляет поручение или консультацию из PWA-формы."""
+    try:
+        data = request.get_json(force=True)
+        kind = data.get("type")  # "task" or "consult"
+
+        if kind == "task":
+            deadline = normalize_date(data.get("deadline", ""))
+            task = data.get("task", "")
+            assignee = data.get("assignee", "")
+            prio_raw = str(data.get("priority", "2"))
+            priority = "высокий" if prio_raw == "1" else "низкий" if prio_raw == "3" else "средний"
+            note = data.get("note", "")
+
+            ws = get_worksheet(TASKS_SHEET)
+            row = [False, now_str(), deadline, "", task, note, assignee, priority]
+            ws.append_row(row, value_input_option="USER_ENTERED")
+            row_number = len(ws.get_all_values())
+            set_checkbox(TASKS_SHEET, row_number, 1)
+
+            # Уведомление исполнителю
+            _notify_assignee(assignee, task, deadline, priority)
+
+            return jsonify({"ok": True, "row": row_number})
+
+        elif kind == "consult":
+            date_raw = data.get("date", "")
+            tm = data.get("time", "")
+            fio = data.get("fio", "")
+            phone_raw = data.get("phone", "")
+            subject = data.get("subject", "")
+            lawyer = data.get("lawyer", "")
+
+            digits = "".join(c for c in phone_raw if c.isdigit())
+            if digits.startswith("7") and len(digits) == 11:
+                digits = "8" + digits[1:]
+            phone = digits if digits else phone_raw
+
+            date = normalize_date(date_raw)
+
+            ws = get_worksheet(CONSULTS_SHEET)
+            row = [fio, phone, date, tm, subject, lawyer]
+            ws.append_row(row, value_input_option="USER_ENTERED")
+            row_number = len(ws.get_all_values())
+
+            add_calendar_event(date, tm, fio, phone, subject, lawyer)
+
+            return jsonify({"ok": True, "row": row_number})
+
+        return jsonify({"error": "unknown type"}), 400
+
+    except Exception as e:
+        app.logger.exception("api_submit error")
+        return jsonify({"error": str(e)}), 500
+
+
+def _notify_assignee(assignee: str, task: str, deadline: str, priority: str):
+    """Отправляет уведомление исполнителю если знаем его chat_id."""
+    for uid, name in USER_NAMES.items():
+        if name.lower() == assignee.lower():
+            prio_icon = "🔴" if priority == "высокий" else "🟡" if priority == "средний" else "🟢"
+            send_message(uid,
+                f"📋 Новое поручение!\n"
+                f"{task}\n"
+                f"📅 Срок: {deadline}\n"
+                f"{prio_icon} {priority.capitalize()}")
+            break
 
 
 # =========================================

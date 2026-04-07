@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#09090b">
+<title>LexDesk</title>
+<link rel="manifest" href="/lexdesk-app/manifest.json">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#09090b;--s1:#18181b;--s2:#27272a;--s3:#3f3f46;
+  --border:rgba(255,255,255,0.08);
+  --violet:#7c3aed;--vsoft:rgba(124,58,237,0.15);
+  --emerald:#10b981;--esoft:rgba(16,185,129,0.12);
+  --amber:#f59e0b;--asoft:rgba(245,158,11,0.12);
+  --red:#ef4444;--rsoft:rgba(239,68,68,0.12);
+  --text:#fafafa;--muted:#71717a;--muted2:#52525b;
+  --r:14px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+  font-size:15px;overflow:hidden;}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;display:none;flex-direction:column;background:var(--bg);}
+.screen.active{display:flex;}
+
+/* ── SCROLL AREA ── */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 120px;}
+.scroll::-webkit-scrollbar{display:none;}
+
+/* ── STATUS BAR SAFE AREA ── */
+.safe-top{height:env(safe-area-inset-top,44px);flex-shrink:0;}
+
+/* ══════════════════════════════════
+   LOGIN
+══════════════════════════════════ */
+#s-login{justify-content:center;align-items:center;padding:40px 28px;
+  background:linear-gradient(160deg,#0f0a1e 0%,var(--bg) 65%);}
+.logo-wrap{width:80px;height:80px;border-radius:22px;
+  background:linear-gradient(135deg,var(--violet),#a855f7);
+  display:flex;align-items:center;justify-content:center;font-size:36px;
+  margin-bottom:24px;box-shadow:0 20px 60px rgba(124,58,237,.4);}
+.login-title{font-size:30px;font-weight:800;letter-spacing:-.5px;}
+.login-sub{color:var(--muted);font-size:14px;margin-top:6px;margin-bottom:48px;text-align:center;}
+.btn{width:100%;padding:17px;border:none;border-radius:var(--r);
+  font-size:16px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform .1s,opacity .1s;}
+.btn:active{transform:scale(.97);opacity:.9;}
+.btn-tg{background:linear-gradient(135deg,#2481cc,#1a6baa);color:#fff;
+  box-shadow:0 8px 32px rgba(36,129,204,.35);margin-bottom:12px;}
+.btn-pin{background:var(--s1);color:var(--text);border:1px solid var(--border);}
+.divider{display:flex;align-items:center;gap:12px;color:var(--muted2);font-size:13px;margin:8px 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* PIN screen */
+.pin-screen{width:100%;max-width:320px;}
+.pin-display{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px;text-align:center;font-size:28px;letter-spacing:8px;margin-bottom:16px;
+  min-height:60px;}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pin-key{background:var(--s1);border:1px solid var(--border);border-radius:12px;
+  padding:18px;font-size:20px;font-weight:600;cursor:pointer;text-align:center;
+  transition:background .1s;}
+.pin-key:active{background:var(--s2);}
+.pin-back{color:var(--muted);font-size:13px;text-align:center;margin-top:12px;cursor:pointer;}
+
+/* ══════════════════════════════════
+   TOPBAR
+══════════════════════════════════ */
+.topbar{padding:8px 16px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-left h1{font-size:22px;font-weight:800;letter-spacing:-.3px;}
+.topbar-left p{font-size:13px;color:var(--muted);margin-top:1px;}
+.avatar{width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--violet),#a855f7);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0;}
+
+/* ══════════════════════════════════
+   BANNER STATS
+══════════════════════════════════ */
+.stats-row{display:flex;gap:10px;margin-bottom:16px;}
+.stat-card{flex:1;background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 12px;text-align:center;}
+.stat-card .num{font-size:26px;font-weight:800;line-height:1;}
+.stat-card .lbl{font-size:11px;color:var(--muted);margin-top:3px;}
+.stat-card.danger .num{color:var(--red);}
+.stat-card.warn .num{color:var(--amber);}
+.stat-card.ok .num{color:var(--emerald);}
+
+/* ══════════════════════════════════
+   SECTION HEADER
+══════════════════════════════════ */
+.sec{margin-top:20px;margin-bottom:10px;
+  display:flex;justify-content:space-between;align-items:center;}
+.sec h3{font-size:15px;font-weight:700;}
+.sec-count{font-size:12px;color:var(--muted);
+  background:var(--s2);padding:2px 8px;border-radius:10px;}
+
+/* ══════════════════════════════════
+   TASK CARD
+══════════════════════════════════ */
+.task-card{background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;margin-bottom:10px;}
+.task-card.over{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04);}
+.task-card.today{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.04);}
+.tc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.tc-title{font-size:14px;font-weight:600;line-height:1.35;flex:1;}
+.badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.b-high{background:var(--rsoft);color:var(--red);}
+.b-mid{background:var(--asoft);color:var(--amber);}
+.b-low{background:var(--esoft);color:var(--emerald);}
+.tc-meta{display:flex;flex-wrap:wrap;gap:10px;}
+.tc-meta span{font-size:12px;color:var(--muted);}
+.tc-meta .over-date{color:var(--red);font-weight:600;}
+
+/* ══════════════════════════════════
+   CONSULT CARD
+══════════════════════════════════ */
+.consult-card{background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;margin-bottom:10px;
+  display:flex;gap:12px;align-items:center;}
+.c-time{background:var(--vsoft);color:#c4b5fd;border-radius:10px;
+  padding:8px 10px;font-size:15px;font-weight:700;text-align:center;
+  min-width:54px;flex-shrink:0;}
+.c-info{flex:1;min-width:0;}
+.c-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.c-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.c-lawyer{font-size:11px;color:#a78bfa;background:var(--vsoft);
+  padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+
+/* ══════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════ */
+.empty{text-align:center;padding:32px 16px;color:var(--muted);}
+.empty .ico{font-size:36px;margin-bottom:12px;}
+.empty p{font-size:14px;}
+
+/* ══════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════ */
+.bnav{position:fixed;bottom:0;left:0;right:0;
+  background:rgba(18,18,20,.96);backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;padding:8px 0;
+  padding-bottom:calc(8px + var(--safe-bottom));}
+.nt{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;
+  padding:4px 0;position:relative;}
+.nt.on{color:#c4b5fd;}
+.nt .ic{font-size:22px;line-height:1;}
+.nt-dot{position:absolute;top:2px;right:calc(50% - 18px);
+  width:8px;height:8px;border-radius:50%;background:var(--red);}
+
+/* ══════════════════════════════════
+   FORM SCREEN
+══════════════════════════════════ */
+.seg{display:flex;background:var(--s1);border-radius:12px;padding:4px;margin-bottom:20px;}
+.seg-btn{flex:1;padding:11px;text-align:center;font-size:14px;font-weight:600;
+  color:var(--muted);border-radius:9px;cursor:pointer;transition:all .15s;}
+.seg-btn.on{background:var(--violet);color:#fff;}
+.field{margin-bottom:16px;}
+.field label{font-size:11px;color:var(--muted);font-weight:700;
+  letter-spacing:.6px;text-transform:uppercase;display:block;margin-bottom:7px;}
+.field input,.field textarea,.field select{
+  width:100%;background:var(--s1);border:1px solid var(--border);
+  border-radius:12px;padding:14px;color:var(--text);font-size:15px;
+  outline:none;font-family:inherit;appearance:none;}
+.field textarea{resize:none;height:88px;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(124,58,237,.5);}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;}
+.prio-row{display:flex;gap:8px;}
+.prio-opt{flex:1;padding:13px 4px;text-align:center;border:1px solid var(--border);
+  border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;
+  color:var(--muted);}
+.prio-opt.p1{background:var(--rsoft);border-color:var(--red);color:var(--red);}
+.prio-opt.p2{background:var(--asoft);border-color:var(--amber);color:var(--amber);}
+.prio-opt.p3{background:var(--esoft);border-color:var(--emerald);color:var(--emerald);}
+.btn-submit{width:100%;padding:18px;background:linear-gradient(135deg,var(--violet),#a855f7);
+  border:none;border-radius:var(--r);color:#fff;font-size:16px;font-weight:700;
+  cursor:pointer;margin-top:8px;box-shadow:0 8px 32px rgba(124,58,237,.3);}
+.btn-submit:active{transform:scale(.98);}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ══════════════════════════════════
+   FILTERS
+══════════════════════════════════ */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;flex-shrink:0;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;white-space:nowrap;
+  background:var(--s1);border:1px solid var(--border);color:var(--muted);cursor:pointer;flex-shrink:0;}
+.chip.on{background:var(--vsoft);border-color:rgba(124,58,237,.4);color:#c4b5fd;}
+
+/* ══════════════════════════════════
+   NOTIF CARD
+══════════════════════════════════ */
+.notif-card{background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;margin-bottom:10px;display:flex;gap:12px;}
+.n-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:20px;flex-shrink:0;}
+.n-body{flex:1;}
+.n-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.n-text{font-size:13px;color:var(--muted);line-height:1.4;}
+.n-time{font-size:11px;color:var(--muted2);margin-top:6px;}
+.n-new .n-title::before{content:'';display:inline-block;width:7px;height:7px;
+  border-radius:50%;background:var(--violet);margin-right:6px;vertical-align:middle;}
+
+/* ══════════════════════════════════
+   TOAST
+══════════════════════════════════ */
+.toast{position:fixed;bottom:calc(80px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--s2);color:var(--text);padding:12px 20px;border-radius:12px;
+  font-size:14px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;
+  white-space:nowrap;z-index:999;border:1px solid var(--border);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* LOADER */
+.loader{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     SCREEN: LOGIN
+══════════════════════════════════ -->
+<div class="screen active" id="s-login">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 28px;">
+    <div class="logo-wrap">⚖️</div>
+    <div class="login-title">LexDesk</div>
+    <div class="login-sub">Адвокатский кабинет</div>
+
+    <!-- Telegram Login Widget контейнер -->
+    <div id="tg-login-wrap" style="width:100%;margin-bottom:12px;">
+      <button class="btn btn-tg" id="tg-btn" onclick="startTgLogin()">
+        ✈️ Войти через Telegram
+      </button>
+    </div>
+
+    <div class="divider">или</div>
+
+    <button class="btn btn-pin" onclick="showPin()">
+      🔑 Войти по коду
+    </button>
+
+    <!-- PIN ввод -->
+    <div class="pin-screen" id="pin-block" style="display:none;margin-top:20px;">
+      <div class="pin-display" id="pin-display">_ _ _ _</div>
+      <div class="pin-grid">
+        <div class="pin-key" onclick="pinKey('1')">1</div>
+        <div class="pin-key" onclick="pinKey('2')">2</div>
+        <div class="pin-key" onclick="pinKey('3')">3</div>
+        <div class="pin-key" onclick="pinKey('4')">4</div>
+        <div class="pin-key" onclick="pinKey('5')">5</div>
+        <div class="pin-key" onclick="pinKey('6')">6</div>
+        <div class="pin-key" onclick="pinKey('7')">7</div>
+        <div class="pin-key" onclick="pinKey('8')">8</div>
+        <div class="pin-key" onclick="pinKey('9')">9</div>
+        <div class="pin-key" onclick="pinKey('del')">⌫</div>
+        <div class="pin-key" onclick="pinKey('0')">0</div>
+        <div class="pin-key" onclick="pinKey('ok')" style="background:var(--violet);color:#fff;">OK</div>
+      </div>
+      <div class="pin-back" onclick="hidePin()">← Назад</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN: МОИ ЗАДАЧИ
+══════════════════════════════════ -->
+<div class="screen" id="s-tasks">
+  <div class="safe-top"></div>
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 id="tasks-title">Мои задачи</h1>
+      <p id="tasks-date"></p>
+    </div>
+    <div class="avatar" id="user-avatar" onclick="showLogout()">АА</div>
+  </div>
+
+  <div class="scroll" id="tasks-scroll">
+    <div class="stats-row">
+      <div class="stat-card danger"><div class="num" id="st-over">—</div><div class="lbl">Просрочено</div></div>
+      <div class="stat-card warn"><div class="num" id="st-today">—</div><div class="lbl">Сегодня</div></div>
+      <div class="stat-card ok"><div class="num" id="st-soon">—</div><div class="lbl">Предстоят</div></div>
+    </div>
+    <div id="tasks-body"><div class="empty"><div class="ico">⏳</div><p>Загрузка...</p></div></div>
+  </div>
+
+  <div class="bnav" id="bnav-tasks">
+    <div class="nt on" onclick="navTo('tasks')"><span class="ic">📋</span>Задачи</div>
+    <div class="nt" onclick="navTo('add')"><span class="ic">➕</span>Добавить</div>
+    <div class="nt" id="nav-team-btn" onclick="navTo('team')" style="display:none;"><span class="ic">👥</span>Команда</div>
+    <div class="nt" onclick="navTo('notif')"><span class="ic">🔔</span>Уведомления<div class="nt-dot" id="notif-dot" style="display:none;"></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN: ДОБАВИТЬ
+══════════════════════════════════ -->
+<div class="screen" id="s-add">
+  <div class="safe-top"></div>
+  <div class="topbar">
+    <div class="topbar-left"><h1>Новая запись</h1></div>
+  </div>
+
+  <div class="scroll">
+    <div class="seg">
+      <div class="seg-btn on" id="seg-task" onclick="switchForm('task')">📋 Поручение</div>
+      <div class="seg-btn" id="seg-consult" onclick="switchForm('consult')">📅 Консультация</div>
+    </div>
+
+    <!-- ФОРМА ПОРУЧЕНИЕ -->
+    <div id="form-task">
+      <div class="field">
+        <label>Задача</label>
+        <textarea id="f-task" placeholder="Опишите что нужно сделать..."></textarea>
+      </div>
+      <div class="field">
+        <label>Срок исполнения</label>
+        <input type="date" id="f-deadline">
+      </div>
+      <div class="field" id="assignee-field">
+        <label>Исполнитель</label>
+        <select id="f-assignee">
+          <option value="">— выбрать —</option>
+          <option>Наталья</option>
+          <option>Аня</option>
+          <option>Сергей</option>
+          <option>Коля</option>
+          <option>Мария</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Приоритет</label>
+        <div class="prio-row">
+          <div class="prio-opt p1" id="p1" onclick="setPrio(1)">🔴 Высокий</div>
+          <div class="prio-opt" id="p2" onclick="setPrio(2)" style="color:var(--muted);">🟡 Средний</div>
+          <div class="prio-opt" id="p3" onclick="setPrio(3)" style="color:var(--muted);">🟢 Низкий</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Примечание</label>
+        <input type="text" id="f-note" placeholder="Необязательно...">
+      </div>
+      <button class="btn-submit" id="submit-task" onclick="submitTask()">Записать поручение</button>
+    </div>
+
+    <!-- ФОРМА КОНСУЛЬТАЦИЯ -->
+    <div id="form-consult" style="display:none;">
+      <div class="field">
+        <label>ФИО клиента</label>
+        <input type="text" id="f-fio" placeholder="Иванов Иван Иванович">
+      </div>
+      <div class="field">
+        <label>Телефон</label>
+        <input type="tel" id="f-phone" placeholder="89991234567">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <div class="field" style="flex:1;">
+          <label>Дата</label>
+          <input type="date" id="f-cdate">
+        </div>
+        <div class="field" style="flex:1;">
+          <label>Время</label>
+          <input type="time" id="f-ctime">
+        </div>
+      </div>
+      <div class="field">
+        <label>Тема консультации</label>
+        <textarea id="f-subject" placeholder="Раздел имущества при разводе..." style="height:70px;"></textarea>
+      </div>
+      <div class="field">
+        <label>Адвокат</label>
+        <select id="f-clawyer">
+          <option value="">— выбрать —</option>
+          <option>Наталья</option>
+          <option>Аня</option>
+          <option>Сергей</option>
+        </select>
+      </div>
+      <button class="btn-submit" id="submit-consult" onclick="submitConsult()">Записать консультацию →📅</button>
+    </div>
+  </div>
+
+  <div class="bnav">
+    <div class="nt" onclick="navTo('tasks')"><span class="ic">📋</span>Задачи</div>
+    <div class="nt on" onclick="navTo('add')"><span class="ic">➕</span>Добавить</div>
+    <div class="nt" id="nav-team-btn2" onclick="navTo('team')" style="display:none;"><span class="ic">👥</span>Команда</div>
+    <div class="nt" onclick="navTo('notif')"><span class="ic">🔔</span>Уведомления</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN: КОМАНДА (только admin)
+══════════════════════════════════ -->
+<div class="screen" id="s-team">
+  <div class="safe-top"></div>
+  <div class="topbar">
+    <div class="topbar-left"><h1>Все поручения</h1></div>
+    <div class="avatar" style="background:linear-gradient(135deg,#059669,#10b981);" id="team-avatar">НИ</div>
+  </div>
+
+  <div class="scroll" id="team-scroll">
+    <div class="chips" id="filter-chips">
+      <div class="chip on" onclick="setFilter('all',this)">Все</div>
+      <div class="chip" onclick="setFilter('over',this)">⚠️ Просроченные</div>
+      <div class="chip" onclick="setFilter('today',this)">Сегодня</div>
+      <div class="chip" onclick="setFilter('week',this)">Эта неделя</div>
+    </div>
+    <div class="chips" id="person-chips">
+      <div class="chip on" onclick="setAssignee('',this)">Все</div>
+      <div class="chip" onclick="setAssignee('Наталья',this)">Наталья</div>
+      <div class="chip" onclick="setAssignee('Аня',this)">Аня</div>
+      <div class="chip" onclick="setAssignee('Сергей',this)">Сергей</div>
+      <div class="chip" onclick="setAssignee('Коля',this)">Коля</div>
+      <div class="chip" onclick="setAssignee('Мария',this)">Мария</div>
+    </div>
+    <div id="team-body"><div class="empty"><div class="ico">⏳</div><p>Загрузка...</p></div></div>
+  </div>
+
+  <div class="bnav">
+    <div class="nt" onclick="navTo('tasks')"><span class="ic">📋</span>Задачи</div>
+    <div class="nt" onclick="navTo('add')"><span class="ic">➕</span>Добавить</div>
+    <div class="nt on" onclick="navTo('team')"><span class="ic">👥</span>Команда</div>
+    <div class="nt" onclick="navTo('notif')"><span class="ic">🔔</span>Уведомления</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN: УВЕДОМЛЕНИЯ
+══════════════════════════════════ -->
+<div class="screen" id="s-notif">
+  <div class="safe-top"></div>
+  <div class="topbar">
+    <div class="topbar-left"><h1>Уведомления</h1></div>
+  </div>
+  <div class="scroll" id="notif-body">
+    <div class="empty"><div class="ico">🔔</div><p>Уведомлений пока нет</p></div>
+  </div>
+  <div class="bnav">
+    <div class="nt" onclick="navTo('tasks')"><span class="ic">📋</span>Задачи</div>
+    <div class="nt" onclick="navTo('add')"><span class="ic">➕</span>Добавить</div>
+    <div class="nt" id="nav-team-btn3" onclick="navTo('team')" style="display:none;"><span class="ic">👥</span>Команда</div>
+    <div class="nt on" onclick="navTo('notif')"><span class="ic">🔔</span>Уведомления</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════
+const API = '';  // same origin — Railway
+const BOT_USERNAME = 'LexDesk_bot'; // замени на реального бота
+
+// ════════════════════════════════════
+// STATE
+// ════════════════════════════════════
+let user = JSON.parse(localStorage.getItem('ld_user') || 'null');
+let allTasks = [], allConsults = [];
+let teamFilter = 'all', teamAssignee = '';
+let selectedPrio = 1;
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+window.onload = () => {
+  setTodayDefault();
+  if (user) {
+    enterApp();
+  }
+};
+
+function setTodayDefault() {
+  const today = new Date().toISOString().split('T')[0];
+  if (document.getElementById('f-deadline')) document.getElementById('f-deadline').value = today;
+  if (document.getElementById('f-cdate')) document.getElementById('f-cdate').value = today;
+}
+
+function enterApp() {
+  // Показываем нужные вкладки в зависимости от роли
+  const isAdmin = user.role === 'admin';
+  ['nav-team-btn','nav-team-btn2','nav-team-btn3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isAdmin ? 'flex' : 'none';
+  });
+
+  // Только admin видит исполнителя (юрист видит только свои)
+  const af = document.getElementById('assignee-field');
+  if (af) af.style.display = isAdmin ? 'block' : 'none';
+
+  // Аватар
+  const initials = (user.name || 'АА').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('user-avatar').textContent = initials;
+
+  // Дата
+  const now = new Date();
+  const days = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  document.getElementById('tasks-date').textContent =
+    `${now.getDate()} ${months[now.getMonth()]}, ${days[now.getDay()]}`;
+
+  navTo('tasks');
+  loadData();
+}
+
+// ════════════════════════════════════
+// AUTH — TELEGRAM LOGIN
+// ════════════════════════════════════
+function startTgLogin() {
+  // Telegram Login Widget — открывает Telegram для подтверждения
+  const callbackUrl = encodeURIComponent(window.location.origin + '/auth/telegram');
+  const w = 550, h = 470;
+  const left = (screen.width - w) / 2;
+  const top = (screen.height - h) / 2;
+  const popup = window.open(
+    `https://oauth.telegram.org/auth?bot_id=${BOT_USERNAME}&origin=${window.location.origin}&embed=1&request_access=write`,
+    'telegram_oauth',
+    `width=${w},height=${h},left=${left},top=${top}`
+  );
+
+  window.addEventListener('message', async (e) => {
+    if (e.origin !== 'https://oauth.telegram.org') return;
+    const data = e.data;
+    if (!data || !data.id) return;
+
+    // Верифицируем на сервере
+    const params = new URLSearchParams(data).toString();
+    const res = await fetch(`/auth/telegram?${params}`);
+    if (!res.ok) { showToast('❌ Ошибка авторизации'); return; }
+    const u = await res.json();
+    if (!u.ok) { showToast('❌ ' + u.error); return; }
+
+    user = u;
+    localStorage.setItem('ld_user', JSON.stringify(u));
+    enterApp();
+  }, {once: true});
+}
+
+// ════════════════════════════════════
+// AUTH — PIN
+// ════════════════════════════════════
+const PIN_ROLES = {
+  '1111': {name:'Наталья', role:'admin'},
+  '2222': {name:'Аня',     role:'admin'},
+  '3333': {name:'Сергей',  role:'lawyer'},
+  '4444': {name:'Коля',    role:'lawyer'},
+  '5555': {name:'Мария',   role:'lawyer'},
+};
+let pinVal = '';
+
+function showPin() {
+  document.getElementById('pin-block').style.display = 'block';
+}
+function hidePin() {
+  document.getElementById('pin-block').style.display = 'none';
+  pinVal = '';
+  updatePinDisplay();
+}
+function pinKey(k) {
+  if (k === 'del') { pinVal = pinVal.slice(0,-1); }
+  else if (k === 'ok') { checkPin(); return; }
+  else if (pinVal.length < 4) { pinVal += k; }
+  updatePinDisplay();
+  if (pinVal.length === 4) setTimeout(checkPin, 200);
+}
+function updatePinDisplay() {
+  const d = document.getElementById('pin-display');
+  const filled = '●'.repeat(pinVal.length);
+  const empty  = '○'.repeat(4 - pinVal.length);
+  d.textContent = filled + empty;
+}
+function checkPin() {
+  const role = PIN_ROLES[pinVal];
+  if (role) {
+    user = {...role, user_id: 'pin_' + pinVal};
+    localStorage.setItem('ld_user', JSON.stringify(user));
+    enterApp();
+  } else {
+    showToast('❌ Неверный код');
+    pinVal = '';
+    updatePinDisplay();
+  }
+}
+
+function showLogout() {
+  if (confirm(`Выйти из аккаунта ${user.name}?`)) {
+    localStorage.removeItem('ld_user');
+    user = null;
+    show('s-login');
+  }
+}
+
+// ════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════
+const screenMap = {tasks:'s-tasks', add:'s-add', team:'s-team', notif:'s-notif'};
+
+function navTo(tab) {
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenMap[tab]).classList.add('active');
+
+  if (tab === 'tasks') loadData();
+  if (tab === 'team')  renderTeam();
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ════════════════════════════════════
+// LOAD DATA
+// ════════════════════════════════════
+async function loadData() {
+  try {
+    const res = await fetch(`${API}/api/data`);
+    const data = await res.json();
+    allTasks = data.tasks || [];
+    allConsults = data.consults || [];
+    renderMyTasks();
+    renderTeam();
+  } catch(e) {
+    document.getElementById('tasks-body').innerHTML =
+      '<div class="empty"><div class="ico">⚠️</div><p>Не удалось загрузить данные</p></div>';
+  }
+}
+
+// ════════════════════════════════════
+// RENDER MY TASKS
+// ════════════════════════════════════
+function renderMyTasks() {
+  const today = todayDate();
+  const isAdmin = user && user.role === 'admin';
+
+  // Фильтр по исполнителю для юриста
+  let tasks = allTasks.filter(t => {
+    const done = String(t['исполнение']||'').toUpperCase();
+    if (['TRUE','ИСТИНА','1'].includes(done)) return false;
+    if (!isAdmin && t['Исполнитель'] !== user.name) return false;
+    return true;
+  });
+
+  const over  = tasks.filter(t => parseDate(t['Срок исполнения']) < today);
+  const tod   = tasks.filter(t => parseDate(t['Срок исполнения'])?.toDateString() === today.toDateString());
+  const soon  = tasks.filter(t => { const d = parseDate(t['Срок исполнения']); return d && d > today && d.toDateString() !== today.toDateString(); });
+
+  document.getElementById('st-over').textContent  = over.length;
+  document.getElementById('st-today').textContent = tod.length;
+  document.getElementById('st-soon').textContent  = soon.length;
+
+  let html = '';
+
+  // Сегодняшние консультации (для admin)
+  if (isAdmin) {
+    const todConsults = allConsults.filter(c => parseDate(c['Дата'])?.toDateString() === today.toDateString());
+    if (todConsults.length) {
+      html += `<div class="sec"><h3>📅 Консультации сегодня</h3><span class="sec-count">${todConsults.length}</span></div>`;
+      todConsults.forEach(c => {
+        html += `<div class="consult-card">
+          <div class="c-time">${c['Время']||'—'}</div>
+          <div class="c-info">
+            <div class="c-name">${c['ФИО']||'—'}</div>
+            <div class="c-sub">📞 ${c['Телефон']||'—'} · ${c['Суть вопроса']||''}</div>
+          </div>
+          <div class="c-lawyer">${c['Адвокат']||''}</div>
+        </div>`;
+      });
+    }
+  }
+
+  if (over.length) {
+    html += `<div class="sec"><h3>⚠️ Просроченные</h3><span class="sec-count">${over.length}</span></div>`;
+    over.forEach(t => html += taskCard(t, 'over'));
+  }
+  if (tod.length) {
+    html += `<div class="sec"><h3>📋 На сегодня</h3><span class="sec-count">${tod.length}</span></div>`;
+    tod.forEach(t => html += taskCard(t, 'today'));
+  }
+  if (soon.length) {
+    html += `<div class="sec"><h3>📌 Предстоящие</h3><span class="sec-count">${soon.length}</span></div>`;
+    soon.forEach(t => html += taskCard(t, ''));
+  }
+
+  if (!html) html = '<div class="empty"><div class="ico">✅</div><p>Нет активных задач</p></div>';
+  document.getElementById('tasks-body').innerHTML = html;
+}
+
+// ════════════════════════════════════
+// RENDER TEAM (admin)
+// ════════════════════════════════════
+function renderTeam() {
+  if (!document.getElementById('team-body')) return;
+  const today = todayDate();
+  const weekEnd = new Date(today); weekEnd.setDate(today.getDate() + 7);
+
+  let tasks = allTasks.filter(t => {
+    const done = String(t['исполнение']||'').toUpperCase();
+    return !['TRUE','ИСТИНА','1'].includes(done);
+  });
+
+  if (teamAssignee) tasks = tasks.filter(t => t['Исполнитель'] === teamAssignee);
+
+  if (teamFilter === 'over')  tasks = tasks.filter(t => parseDate(t['Срок исполнения']) < today);
+  if (teamFilter === 'today') tasks = tasks.filter(t => parseDate(t['Срок исполнения'])?.toDateString() === today.toDateString());
+  if (teamFilter === 'week')  tasks = tasks.filter(t => { const d = parseDate(t['Срок исполнения']); return d && d >= today && d <= weekEnd; });
+
+  let html = '';
+  if (!tasks.length) {
+    html = '<div class="empty"><div class="ico">✅</div><p>Задач не найдено</p></div>';
+  } else {
+    tasks.forEach(t => {
+      const d = parseDate(t['Срок исполнения']);
+      const cls = !d ? '' : d < today ? 'over' : d.toDateString() === today.toDateString() ? 'today' : '';
+      html += taskCard(t, cls);
+    });
+  }
+  document.getElementById('team-body').innerHTML = html;
+}
+
+function taskCard(t, cls) {
+  const prio = t['Приоритет'] || '';
+  const bCls = prio === 'высокий' ? 'b-high' : prio === 'средний' ? 'b-mid' : 'b-low';
+  const bIcon = prio === 'высокий' ? '🔴' : prio === 'средний' ? '🟡' : '🟢';
+  const deadline = t['Срок исполнения'] || '—';
+  const isOver = cls === 'over';
+  return `<div class="task-card ${cls}">
+    <div class="tc-top">
+      <div class="tc-title">${t['Задача']||'—'}</div>
+      <div class="badge ${bCls}">${bIcon} ${prio}</div>
+    </div>
+    <div class="tc-meta">
+      <span class="${isOver?'over-date':''}">📅 ${deadline}</span>
+      <span>👤 ${t['Исполнитель']||'—'}</span>
+      ${t['Примечание'] ? `<span>💬 ${t['Примечание']}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════
+// FORM — TASK
+// ════════════════════════════════════
+function switchForm(type) {
+  if (type === 'task') {
+    document.getElementById('form-task').style.display = 'block';
+    document.getElementById('form-consult').style.display = 'none';
+    document.getElementById('seg-task').classList.add('on');
+    document.getElementById('seg-consult').classList.remove('on');
+  } else {
+    document.getElementById('form-task').style.display = 'none';
+    document.getElementById('form-consult').style.display = 'block';
+    document.getElementById('seg-task').classList.remove('on');
+    document.getElementById('seg-consult').classList.add('on');
+  }
+}
+
+function setPrio(n) {
+  selectedPrio = n;
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('p'+i);
+    el.className = 'prio-opt' + (i === n ? ` p${i}` : '');
+    if (i !== n) el.style.color = 'var(--muted)';
+  });
+}
+
+async function submitTask() {
+  const task = document.getElementById('f-task').value.trim();
+  const deadline = document.getElementById('f-deadline').value;
+  const isAdmin = user && user.role === 'admin';
+  const assignee = isAdmin
+    ? document.getElementById('f-assignee').value
+    : user.name;
+  const note = document.getElementById('f-note').value.trim();
+
+  if (!task) { showToast('Укажите задачу'); return; }
+  if (!deadline) { showToast('Укажите срок'); return; }
+  if (!assignee) { showToast('Выберите исполнителя'); return; }
+
+  const btn = document.getElementById('submit-task');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>Записываю...';
+
+  const ddParts = deadline.split('-');
+  const deadlineFormatted = `${ddParts[2]}.${ddParts[1]}.${ddParts[0]}`;
+
+  try {
+    const res = await fetch(`${API}/api/submit`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({type:'task', task, deadline: deadlineFormatted,
+        assignee, priority: String(selectedPrio), note})
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast('✅ Поручение записано!');
+      document.getElementById('f-task').value = '';
+      document.getElementById('f-note').value = '';
+      setPrio(1);
+    } else {
+      showToast('❌ Ошибка: ' + data.error);
+    }
+  } catch(e) {
+    showToast('❌ Нет соединения');
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Записать поручение';
+}
+
+async function submitConsult() {
+  const fio     = document.getElementById('f-fio').value.trim();
+  const phone   = document.getElementById('f-phone').value.trim();
+  const cdate   = document.getElementById('f-cdate').value;
+  const ctime   = document.getElementById('f-ctime').value;
+  const subject = document.getElementById('f-subject').value.trim();
+  const lawyer  = document.getElementById('f-clawyer').value;
+
+  if (!fio)    { showToast('Укажите ФИО клиента'); return; }
+  if (!cdate)  { showToast('Укажите дату'); return; }
+  if (!lawyer) { showToast('Выберите адвоката'); return; }
+
+  const btn = document.getElementById('submit-consult');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>Записываю...';
+
+  const dp = cdate.split('-');
+  const dateFormatted = `${dp[2]}.${dp[1]}.${dp[0]}`;
+
+  try {
+    const res = await fetch(`${API}/api/submit`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({type:'consult', fio, phone, date: dateFormatted,
+        time: ctime, subject, lawyer})
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast('✅ Консультация записана + добавлена в Календарь');
+      document.getElementById('f-fio').value = '';
+      document.getElementById('f-phone').value = '';
+      document.getElementById('f-subject').value = '';
+      document.getElementById('f-clawyer').value = '';
+    } else {
+      showToast('❌ Ошибка: ' + data.error);
+    }
+  } catch(e) {
+    showToast('❌ Нет соединения');
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Записать консультацию →📅';
+}
+
+// ════════════════════════════════════
+// FILTERS (team screen)
+// ════════════════════════════════════
+function setFilter(f, el) {
+  teamFilter = f;
+  document.querySelectorAll('#filter-chips .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderTeam();
+}
+function setAssignee(a, el) {
+  teamAssignee = a;
+  document.querySelectorAll('#person-chips .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderTeam();
+}
+
+// ════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════
+function todayDate() {
+  const d = new Date(); d.setHours(0,0,0,0); return d;
+}
+
+function parseDate(val) {
+  if (!val) return null;
+  const s = String(val).trim();
+  // ДД.ММ.ГГГГ
+  const m = s.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
+  // ДД.ММ (текущий год)
+  const m2 = s.match(/^(\d{2})\.(\d{2})$/);
+  if (m2) return new Date(new Date().getFullYear(), +m2[2]-1, +m2[1]);
+  return null;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
