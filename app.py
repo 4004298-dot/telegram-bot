@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import logging
 from datetime import datetime
+import pytz
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import requests
@@ -152,8 +153,10 @@ def send_message(chat_id, text):
 # =========================================
 # UTILS
 # =========================================
+MSK = pytz.timezone(TIMEZONE_LABEL)
+
 def now_str():
-    return datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+    return datetime.now(MSK).strftime("%d.%m.%Y %H:%M:%S")
 
 
 def normalize_date(value: str) -> str:
@@ -163,7 +166,7 @@ def normalize_date(value: str) -> str:
         return f"{value[:2]}.{value[2:4]}.{value[4:]}"
 
     if len(value) == 5 and value[2] == ".":
-        year = datetime.now().strftime("%Y")
+        year = datetime.now(MSK).strftime("%Y")
         return f"{value}.{year}"
 
     return value
@@ -235,7 +238,7 @@ def add_calendar_event(date: str, tm: str, fio: str, phone: str, subject: str, l
         # date like "20.04.2026" or "20.04", tm like "14:30"
         parts = date.split(".")
         if len(parts) == 2:
-            year = datetime.now().strftime("%Y")
+            year = datetime.now(MSK).strftime("%Y")
             date = f"{parts[0]}.{parts[1]}.{year}"
             parts = date.split(".")
 
