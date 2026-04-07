@@ -215,8 +215,10 @@ def set_checkbox(sheet_title: str, row_number: int, col_number: int = 1):
 # =========================================
 # GOOGLE CALENDAR
 # =========================================
-def add_calendar_event(date: str, tm: str, fio: str, phone: str, subject: str, lawyer: str):
+def add_calendar_event(date: str, tm: str, fio: str, phone: str, subject: str, lawyer: str, chat_id=None):
     if not GOOGLE_CALENDAR_ID:
+        if chat_id:
+            send_message(chat_id, "⚠️ GOOGLE_CALENDAR_ID не задан")
         return
     try:
         # date like "20.04.2026" or "20.04", tm like "14:30"
@@ -246,8 +248,10 @@ def add_calendar_event(date: str, tm: str, fio: str, phone: str, subject: str, l
             body=event
         ).execute()
         app.logger.info("Calendar event created: %s %s", fio, start_dt)
-    except Exception:
+    except Exception as e:
         app.logger.exception("Calendar event creation failed")
+        if chat_id:
+            send_message(chat_id, f"⚠️ Ошибка календаря: {e}")
 
 
 # =========================================
@@ -345,7 +349,7 @@ def parse_consult(chat_id, lines):
     ws.append_row(row, value_input_option="USER_ENTERED")
     row_number = len(ws.get_all_values())
 
-    add_calendar_event(date, tm, fio, phone, subject, lawyer)
+    add_calendar_event(date, tm, fio, phone, subject, lawyer, chat_id)
 
     send_message(
         chat_id,
