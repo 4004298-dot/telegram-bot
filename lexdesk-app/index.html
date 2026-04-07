@@ -730,15 +730,17 @@ function renderTeam() {
 }
 
 function taskCard(t, cls) {
-  const prio = (t['Приоритет'] || '').toLowerCase();
+  const prioRaw = t['Приоритет'] || '';
+  const prio = prioRaw.toLowerCase();
   const bCls = prio === 'высокий' ? 'b-high' : prio === 'средний' ? 'b-mid' : 'b-low';
   const bIcon = prio === 'высокий' ? '🔴' : prio === 'средний' ? '🟡' : '🟢';
+  const prioLabel = prio === 'высокий' ? 'Высокий' : prio === 'средний' ? 'Средний' : 'Низкий';
   const deadline = t['Срок исполнения'] || '—';
   const isOver = cls === 'over';
   return `<div class="task-card ${cls}">
     <div class="tc-top">
       <div class="tc-title">${t['Задача']||'—'}</div>
-      <div class="badge ${bCls}">${bIcon} ${prio}</div>
+      <div class="badge ${bCls}">${bIcon} ${prioLabel}</div>
     </div>
     <div class="tc-meta">
       <span class="${isOver?'over-date':''}">📅 ${deadline}</span>
