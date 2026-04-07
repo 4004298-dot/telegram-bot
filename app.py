@@ -282,7 +282,11 @@ def parse_consult(chat_id, lines):
     tm = date_time_parts[1] if len(date_time_parts) > 1 else ""
 
     fio = lines[1] if len(lines) > 1 else ""
-    phone = lines[2] if len(lines) > 2 else ""
+    phone_raw = lines[2] if len(lines) > 2 else ""
+    digits = "".join(c for c in phone_raw if c.isdigit())
+    if digits.startswith("7") and len(digits) == 11:
+        digits = "8" + digits[1:]
+    phone = digits if digits else phone_raw
     subject = lines[3] if len(lines) > 3 else ""
     lawyer = lines[4] if len(lines) > 4 else ""
 
