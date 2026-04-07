@@ -4,3 +4,4 @@ gspread==6.1.2
 google-auth==2.35.0
 google-api-python-client==2.149.0
 gunicorn==22.0.0
+Flask-Cors==4.0.1

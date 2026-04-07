@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LexDesk — Адвокатский кабинет</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:      #09090b;
+  --s1:      #18181b;
+  --s2:      #27272a;
+  --s3:      #3f3f46;
+  --border:  rgba(255,255,255,0.07);
+  --violet:  #7c3aed;
+  --vsoft:   rgba(124,58,237,0.12);
+  --emerald: #10b981;
+  --esoft:   rgba(16,185,129,0.12);
+  --amber:   #f59e0b;
+  --asoft:   rgba(245,158,11,0.12);
+  --red:     #ef4444;
+  --rsoft:   rgba(239,68,68,0.12);
+  --blue:    #3b82f6;
+  --bsoft:   rgba(59,130,246,0.12);
+  --text:    #fafafa;
+  --muted:   #71717a;
+  --muted2:  #52525b;
+}
+body {
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:14px; display:flex; height:100vh; overflow:hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:220px; min-width:220px; background:var(--s1);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+}
+.logo {
+  padding:18px 16px 14px;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+}
+.logo-icon {
+  width:30px; height:30px;
+  background:linear-gradient(135deg,var(--violet),#a855f7);
+  border-radius:7px; display:flex; align-items:center;
+  justify-content:center; font-size:14px; flex-shrink:0;
+}
+.logo-name { font-weight:700; font-size:15px; }
+.logo-sub  { font-size:10px; color:var(--muted); }
+
+.nav { padding:12px 10px; flex:1; }
+.nav-label {
+  font-size:10px; font-weight:600; color:var(--muted2);
+  letter-spacing:.7px; text-transform:uppercase;
+  padding:0 6px; margin:10px 0 4px;
+}
+.nav-item {
+  display:flex; align-items:center; gap:9px;
+  padding:8px 8px; border-radius:7px; cursor:pointer;
+  color:var(--muted); font-size:13px; font-weight:500;
+  transition:all .15s; margin-bottom:1px;
+}
+.nav-item:hover { background:var(--s2); color:var(--text); }
+.nav-item.active {
+  background:var(--vsoft); color:#c4b5fd;
+  border:1px solid rgba(124,58,237,.18);
+}
+.nav-item .ic { font-size:15px; width:18px; text-align:center; }
+.nbadge {
+  margin-left:auto; font-size:10px; font-weight:700;
+  padding:1px 6px; border-radius:8px; min-width:18px; text-align:center;
+}
+.nb-red    { background:var(--red); color:#fff; }
+.nb-amber  { background:var(--amber); color:#1c1917; }
+.nb-violet { background:var(--violet); color:#fff; }
+
+.sidebar-foot {
+  padding:10px; border-top:1px solid var(--border);
+}
+.user-row {
+  display:flex; align-items:center; gap:9px;
+  padding:9px 10px; border-radius:8px; background:var(--s2); cursor:pointer;
+}
+.av {
+  width:30px; height:30px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700;
+}
+.av-v { background:linear-gradient(135deg,#7c3aed,#a855f7); }
+.av-g { background:linear-gradient(135deg,#059669,#10b981); }
+.av-b { background:linear-gradient(135deg,#1d4ed8,#3b82f6); }
+.av-o { background:linear-gradient(135deg,#c2410c,#f97316); }
+.user-name { font-size:12px; font-weight:600; }
+.user-role {
+  font-size:10px; color:#a78bfa;
+  background:var(--vsoft); padding:1px 5px;
+  border-radius:4px; width:fit-content; margin-top:1px;
+}
+
+/* ── MAIN ── */
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+.topbar {
+  height:52px; background:var(--s1);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 20px; gap:12px; flex-shrink:0;
+}
+.topbar-title { font-size:15px; font-weight:600; flex:1; }
+.topbar-date  { font-size:12px; color:var(--muted); }
+
+.tbtn {
+  display:flex; align-items:center; gap:5px;
+  padding:6px 13px; border-radius:7px; font-size:12px;
+  font-weight:600; cursor:pointer; border:none; transition:opacity .15s;
+}
+.tbtn-primary { background:var(--violet); color:#fff; }
+.tbtn-primary:hover { opacity:.85; }
+.tbtn-ghost {
+  background:var(--s2); color:var(--text);
+  border:1px solid var(--border);
+}
+.tbtn-ghost:hover { border-color:var(--violet); }
+
+.notif-btn {
+  width:34px; height:34px; border-radius:7px;
+  background:var(--s2); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:15px; position:relative;
+}
+.notif-dot {
+  position:absolute; top:7px; right:7px;
+  width:6px; height:6px; border-radius:50%;
+  background:var(--red); border:1.5px solid var(--s1);
+}
+
+/* ── CONTENT GRID ── */
+.content {
+  flex:1; overflow-y:auto; padding:20px;
+  display:grid;
+  grid-template-columns:1fr 300px;
+  grid-template-rows:auto auto auto;
+  gap:16px;
+  align-content:start;
+}
+
+/* ── TODAY BANNER ── */
+.today-banner {
+  grid-column:1/-1;
+  background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(59,130,246,.06));
+  border:1px solid rgba(124,58,237,.2);
+  border-radius:12px; padding:14px 18px;
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+}
+.today-label {
+  font-size:11px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.8px; color:#a78bfa;
+}
+.today-date { font-size:18px; font-weight:800; }
+.today-divider {
+  width:1px; height:36px; background:var(--border); flex-shrink:0;
+}
+.today-item { display:flex; align-items:center; gap:8px; }
+.today-icon { font-size:20px; }
+.today-text {}
+.today-text .t1 { font-size:13px; font-weight:700; }
+.today-text .t2 { font-size:11px; color:var(--muted); margin-top:1px; }
+
+/* ── CARD ── */
+.card {
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:12px; overflow:hidden;
+}
+.card-head {
+  padding:14px 18px 10px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.card-title { font-size:13px; font-weight:700; }
+.card-link {
+  font-size:11px; color:var(--violet); cursor:pointer;
+  background:none; border:none; font-weight:500;
+}
+.card-link:hover { text-decoration:underline; }
+
+/* ── TODAY CONSULTATIONS ── */
+.consult-list {}
+.consult-item {
+  display:flex; align-items:center; gap:14px;
+  padding:12px 18px; border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .12s;
+}
+.consult-item:last-child { border-bottom:none; }
+.consult-item:hover { background:rgba(255,255,255,.02); }
+
+.time-badge {
+  min-width:64px; text-align:center;
+  padding:5px 10px; border-radius:7px;
+  font-size:13px; font-weight:700; flex-shrink:0;
+}
+.time-now  { background:var(--rsoft); color:#fca5a5; border:1px solid rgba(239,68,68,.2); }
+.time-soon { background:var(--asoft); color:#fcd34d; border:1px solid rgba(245,158,11,.2); }
+.time-reg  { background:var(--s2);    color:var(--text); border:1px solid var(--border); }
+
+.consult-client { flex:1; }
+.client-name { font-size:13px; font-weight:600; }
+.client-sub  { font-size:11px; color:var(--muted); margin-top:2px; }
+.consult-topic {
+  font-size:12px; color:var(--muted); max-width:200px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.chip-btn {
+  padding:5px 10px; border-radius:6px; font-size:11px;
+  font-weight:600; cursor:pointer; border:none; transition:all .15s;
+}
+.chip-open { background:var(--s2); color:var(--text); border:1px solid var(--border); }
+.chip-open:hover { border-color:var(--violet); }
+
+/* ── COURT TABLE ── */
+.court-list {}
+.court-item {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 18px; border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .12s;
+}
+.court-item:last-child { border-bottom:none; }
+.court-item:hover { background:rgba(255,255,255,.02); }
+
+.court-date {
+  min-width:80px; flex-shrink:0;
+}
+.cd-day { font-size:13px; font-weight:700; }
+.cd-time { font-size:11px; color:var(--muted); margin-top:1px; }
+.cd-urgent { color:var(--red) !important; }
+.cd-soon   { color:var(--amber) !important; }
+
+.court-info { flex:1; }
+.court-num   { font-size:13px; font-weight:700; }
+.court-case  { font-size:11px; color:var(--muted); margin-top:1px; }
+.court-place { font-size:11px; color:var(--muted2); margin-top:2px; }
+
+.assignees {
+  display:flex; align-items:center; gap:4px; flex-shrink:0;
+}
+.assignee-chip {
+  display:flex; align-items:center; gap:5px;
+  font-size:11px; color:var(--muted); background:var(--s2);
+  padding:3px 8px; border-radius:5px; border:1px solid var(--border);
+}
+.mini-av {
+  width:18px; height:18px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:700; flex-shrink:0;
+}
+
+.court-link {
+  font-size:11px; font-weight:600; color:var(--violet);
+  background:var(--vsoft); padding:4px 9px;
+  border-radius:5px; border:1px solid rgba(124,58,237,.2);
+  cursor:pointer; white-space:nowrap; flex-shrink:0;
+  text-decoration:none; transition:background .12s;
+}
+.court-link:hover { background:rgba(124,58,237,.2); }
+
+/* ── TASKS ── */
+.task-item {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:11px 18px; border-bottom:1px solid rgba(255,255,255,.04);
+}
+.task-item:last-child { border-bottom:none; }
+.task-cb {
+  width:15px; height:15px; border-radius:4px;
+  border:1.5px solid var(--muted2); flex-shrink:0; margin-top:2px; cursor:pointer;
+}
+.task-body { flex:1; }
+.task-title { font-size:13px; font-weight:500; line-height:1.4; }
+.task-meta  { display:flex; align-items:center; gap:8px; margin-top:5px; flex-wrap:wrap; }
+.prio {
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:10px; font-weight:700; padding:2px 7px;
+  border-radius:4px; border-left:2px solid;
+}
+.p-h { background:var(--rsoft); color:var(--red);    border-color:var(--red);    }
+.p-m { background:var(--asoft); color:var(--amber);  border-color:var(--amber);  }
+.p-l { background:rgba(113,113,122,.1); color:var(--muted); border-color:var(--muted2); }
+.dl  { font-size:11px; color:var(--muted); }
+.dl.overdue { color:var(--red); font-weight:600; }
+.task-who {
+  display:flex; align-items:center; gap:4px;
+  font-size:11px; color:var(--muted);
+}
+
+/* ── MINI CALENDAR ── */
+.mini-cal { padding:16px; }
+.mc-head {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:12px;
+}
+.mc-title { font-size:13px; font-weight:700; }
+.mc-nav { display:flex; gap:3px; }
+.mc-nav button {
+  width:24px; height:24px; border-radius:5px;
+  background:var(--s2); border:1px solid var(--border);
+  color:var(--text); cursor:pointer; font-size:11px;
+}
+.mc-nav button:hover { border-color:var(--violet); }
+
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; }
+.cdow {
+  text-align:center; font-size:10px; font-weight:600;
+  color:var(--muted2); padding:3px 0;
+}
+.cday {
+  text-align:center; padding:5px 2px; border-radius:5px;
+  font-size:11.5px; cursor:pointer; position:relative;
+  color:var(--muted); line-height:1;
+}
+.cday:hover { background:var(--s2); color:var(--text); }
+.cday.today { background:var(--violet); color:#fff; font-weight:700; }
+.cday.other { color:var(--muted2); opacity:.4; }
+.cday.has::after {
+  content:''; position:absolute; bottom:1px; left:50%; transform:translateX(-50%);
+  width:3px; height:3px; border-radius:50%; background:var(--blue);
+}
+.cday.court::after { background:var(--red); }
+.cday.consult::after { background:var(--emerald); }
+
+.cal-legend {
+  display:flex; gap:10px; margin-top:10px;
+  font-size:10px; color:var(--muted);
+}
+.leg { display:flex; align-items:center; gap:3px; }
+.leg-dot { width:6px; height:6px; border-radius:50%; }
+
+.cal-upcoming { margin-top:12px; border-top:1px solid var(--border); padding-top:10px; }
+.cal-event {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 0; border-bottom:1px solid rgba(255,255,255,.03);
+}
+.cal-event:last-child { border-bottom:none; }
+.cal-edot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.cal-einfo { flex:1; }
+.cal-etitle { font-size:12px; font-weight:600; }
+.cal-etime  { font-size:10px; color:var(--muted); margin-top:1px; }
+
+/* ── TELEGRAM STATUS ── */
+.tg-card { padding:14px 16px; }
+.tg-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.tg-status {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:10px; color:var(--emerald); font-weight:600;
+  background:var(--esoft); padding:2px 7px; border-radius:4px;
+}
+.tg-log {
+  font-family:monospace; font-size:11px; color:#86efac;
+  background:var(--bg); border-radius:7px; padding:9px 10px;
+  line-height:1.9;
+}
+.tg-actions { display:flex; gap:7px; margin-top:10px; }
+.tg-btn {
+  flex:1; padding:6px; background:var(--s2);
+  border:1px solid var(--border); border-radius:6px;
+  color:var(--muted); font-size:11px; cursor:pointer; text-align:center;
+}
+.tg-btn:hover { border-color:var(--violet); color:var(--text); }
+
+/* ── MODAL ── */
+.overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.7);
+  backdrop-filter:blur(4px); z-index:200;
+  display:none; align-items:center; justify-content:center;
+}
+.overlay.open { display:flex; }
+.modal {
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:14px; padding:24px; width:440px; max-width:90vw;
+}
+.modal-title { font-size:16px; font-weight:700; margin-bottom:18px; }
+.frow { margin-bottom:12px; }
+.frow2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.flabel { font-size:11px; color:var(--muted); margin-bottom:5px; display:block; font-weight:500; }
+.finput, .fselect {
+  width:100%; background:var(--s2); border:1px solid var(--border);
+  border-radius:7px; padding:8px 11px; color:var(--text); font-size:13px; outline:none;
+  transition:border-color .15s; appearance:none;
+}
+.finput:focus, .fselect:focus { border-color:var(--violet); }
+.modal-btns { display:flex; gap:8px; margin-top:18px; justify-content:flex-end; }
+.btn-p {
+  background:var(--violet); color:#fff; border:none;
+  padding:8px 18px; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer;
+}
+.btn-c {
+  background:var(--s2); border:1px solid var(--border);
+  color:var(--text); padding:8px 14px; border-radius:7px; font-size:13px; cursor:pointer;
+}
+
+/* ── FLOW PAGE ── */
+#page-flow {
+  display:none; width:100%; overflow-y:auto;
+  background:var(--bg); padding:28px 36px 80px;
+}
+.flow-wrap { max-width:820px; margin:0 auto; }
+.back-btn {
+  background:var(--s2); border:1px solid var(--border); color:var(--text);
+  padding:7px 14px; border-radius:7px; cursor:pointer; font-size:12px; margin-bottom:22px;
+}
+.flow-h1  { font-size:22px; font-weight:800; margin-bottom:4px; }
+.flow-sub { color:var(--muted); font-size:13px; margin-bottom:32px; }
+
+.fstep { display:flex; gap:18px; align-items:flex-start; }
+.fconn { display:flex; flex-direction:column; align-items:center; }
+.fcirc {
+  width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:14px; flex-shrink:0; border:2px solid;
+}
+.fline {
+  width:2px; flex:1; min-height:36px;
+  background:linear-gradient(to bottom,rgba(124,58,237,.4),rgba(124,58,237,.08));
+  margin:3px 0;
+}
+.fbody { padding:4px 0 32px; flex:1; }
+.fstep-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; margin-bottom:4px; }
+.fstep-name  { font-size:16px; font-weight:700; margin-bottom:6px; }
+.fstep-desc  { color:var(--muted); font-size:13px; line-height:1.6; }
+.fcode {
+  margin-top:12px; background:var(--s1);
+  border:1px solid var(--border); border-radius:9px;
+  padding:12px 14px; font-family:monospace; font-size:12px;
+  color:#a3e635; white-space:pre-wrap; line-height:1.7;
+}
+.fbox {
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:10px; padding:14px 16px; margin-top:12px;
+}
+.fgrid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; text-align:center; }
+.fgrid3-item .fi { font-size:20px; margin-bottom:6px; }
+.fgrid3-item .fn { font-size:12px; font-weight:700; margin-bottom:2px; }
+.fgrid3-item .fd { font-size:11px; color:var(--muted); }
+.fbot-reply {
+  font-family:monospace; font-size:12px; color:#86efac;
+  background:var(--bg); padding:10px; border-radius:7px; line-height:1.9; margin-top:10px;
+}
+.fcards { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
+.fcard {
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:9px; padding:12px;
+}
+.fcard .fi { font-size:18px; margin-bottom:6px; }
+.fcard .fn { font-size:12px; font-weight:700; margin-bottom:4px; }
+.fcard .fd { font-size:11px; color:var(--muted); line-height:1.5; }
+.froles { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }
+.frole { border-radius:9px; padding:12px; }
+.frole .rn  { font-size:12px; font-weight:700; margin-bottom:8px; }
+.frole .ri  { font-size:11px; color:var(--muted); line-height:1.7; }
+
+.sep { grid-column:1/-1; border:none; border-top:1px solid var(--border); margin:4px 0; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     DASHBOARD PAGE
+══════════════════════════════════════════ -->
+<div id="page-dash" style="display:flex;width:100%;height:100vh;overflow:hidden;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">⚖️</div>
+      <div>
+        <div class="logo-name">LexDesk</div>
+        <div class="logo-sub">Адвокатский кабинет</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-label">Главное</div>
+      <div class="nav-item active"><span class="ic">🏠</span> Дашборд</div>
+      <div class="nav-item" onclick="alert('📋 Поручения\n\nСписок задач команды.\nСотрудники видят только свои.')">
+        <span class="ic">📋</span> Поручения
+        <span class="nbadge nb-red">2</span>
+      </div>
+      <div class="nav-item" onclick="alert('📅 Полный календарь\n\nМесяц / Неделя / День.\nСинхронизирован с Google Calendar.')">
+        <span class="ic">📅</span> Календарь
+        <span class="nbadge nb-amber">4</span>
+      </div>
+      <div class="nav-item" onclick="openModal('consult')">
+        <span class="ic">🤝</span> Консультации
+      </div>
+
+      <div class="nav-label">Работа</div>
+      <div class="nav-item" onclick="alert('⚖️ Судебные дела\n\nКарточки дел с историей слушаний,\nдокументами и ссылками на суды.')">
+        <span class="ic">⚖️</span> Судебные дела
+      </div>
+      <div class="nav-item"><span class="ic">👥</span> Клиенты</div>
+      <div class="nav-item"><span class="ic">📁</span> Документы</div>
+
+      <div class="nav-label">Система</div>
+      <div class="nav-item">
+        <span class="ic">🤖</span> Telegram бот
+        <span class="nbadge nb-violet">●</span>
+      </div>
+      <div class="nav-item"><span class="ic">⚙️</span> Настройки</div>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="user-row">
+        <div class="av av-v">НА</div>
+        <div>
+          <div class="user-name">Наталья А.</div>
+          <div class="user-role">Администратор</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="ptitle">Дашборд</div>
+      <div class="topbar-date">Суббота, 4 апреля 2026</div>
+      <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+      <button class="tbtn tbtn-ghost" onclick="showFlow()">📊 Схема работы</button>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" style="padding-bottom:24px;">
+
+      <!-- TODAY BANNER -->
+      <div class="today-banner">
+        <div>
+          <div class="today-label">Сегодня</div>
+          <div class="today-date">Суббота, 4 апреля</div>
+        </div>
+        <div class="today-divider"></div>
+        <div class="today-item">
+          <div class="today-icon">🤝</div>
+          <div class="today-text">
+            <div class="t1">3 консультации</div>
+            <div class="t2">Ближайшая в 11:00 · Иванов И.И.</div>
+          </div>
+        </div>
+        <div class="today-divider"></div>
+        <div class="today-item">
+          <div class="today-icon">⚖️</div>
+          <div class="today-text">
+            <div class="t1">Суд: 7 апр · пн · 10:00</div>
+            <div class="t2">А40-12345 · Арбитражный суд МО · Зал 312</div>
+          </div>
+        </div>
+        <div class="today-divider"></div>
+        <div class="today-item">
+          <div class="today-icon">🔴</div>
+          <div class="today-text">
+            <div class="t1" style="color:var(--red)">2 просроченных поручения</div>
+            <div class="t2">Требуют внимания сегодня</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEFT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- TODAY CONSULTATIONS -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">🤝 Консультации сегодня</div>
+            <button class="tbtn tbtn-primary" style="font-size:11px;padding:5px 11px;" onclick="openModal('consult')">+ Записать клиента</button>
+          </div>
+          <div class="consult-list" id="consults-list">
+            <div class="consult-item">
+              <div>
+                <div class="time-badge time-now">11:00</div>
+                <div style="text-align:center;margin-top:4px;font-size:10px;font-weight:700;color:var(--red);">● Идёт</div>
+              </div>
+              <div class="consult-client">
+                <div class="client-name">Иванов Иван Иванович</div>
+                <div class="client-sub">+7 999 123-45-67</div>
+              </div>
+              <div class="consult-topic">Раздел имущества при разводе</div>
+              <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+                <div class="mini-av av-v">НА</div>
+                <span style="font-size:11px;color:var(--muted)">Наталья</span>
+              </div>
+              <button class="chip-btn chip-open">Детали</button>
+            </div>
+            <div class="consult-item">
+              <div>
+                <div class="time-badge time-soon">14:00</div>
+                <div style="text-align:center;margin-top:4px;font-size:10px;font-weight:700;color:var(--amber);">⏳ Скоро</div>
+              </div>
+              <div class="consult-client">
+                <div class="client-name">Кравцова Мария Р.</div>
+                <div class="client-sub">+7 926 555-00-11</div>
+              </div>
+              <div class="consult-topic">Незаконное увольнение, трудовой спор</div>
+              <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+                <div class="mini-av av-b">СВ</div>
+                <span style="font-size:11px;color:var(--muted)">Сергей</span>
+              </div>
+              <button class="chip-btn chip-open">Детали</button>
+            </div>
+            <div class="consult-item">
+              <div>
+                <div class="time-badge time-reg">16:30</div>
+                <div style="text-align:center;margin-top:4px;font-size:10px;font-weight:600;color:var(--muted);">Ожидается</div>
+              </div>
+              <div class="consult-client">
+                <div class="client-name">Орлов Павел Дмитриевич</div>
+                <div class="client-sub">+7 916 777-88-99</div>
+              </div>
+              <div class="consult-topic">Взыскание долга по договору займа</div>
+              <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+                <div class="mini-av av-g">АК</div>
+                <span style="font-size:11px;color:var(--muted)">Аня</span>
+              </div>
+              <button class="chip-btn chip-open">Детали</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- UPCOMING COURTS -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">⚖️ Ближайшие суды</div>
+            <button class="card-link" onclick="alert('Открываем раздел Судебные дела...')">Все дела →</button>
+          </div>
+          <div class="court-list">
+            <div class="court-item">
+              <div class="court-date">
+                <div class="cd-day cd-urgent">7 апр · пн</div>
+                <div class="cd-time cd-urgent">10:00 🔥</div>
+              </div>
+              <div class="court-info">
+                <div class="court-num">А40-12345/2026</div>
+                <div class="court-case">Петров vs ООО «СтройГрупп»</div>
+                <div class="court-place">Арбитражный суд МО · Зал 312</div>
+              </div>
+              <div class="assignees">
+                <div class="assignee-chip">
+                  <div class="mini-av av-v">НА</div> Наталья
+                </div>
+                <div class="assignee-chip">
+                  <div class="mini-av av-b">СВ</div> Сергей
+                </div>
+              </div>
+              <a class="court-link" onclick="alert('↗ Открываем дело А40-12345/2026 на kad.arbitr.ru')">↗ Арбитраж</a>
+            </div>
+            <div class="court-item">
+              <div class="court-date">
+                <div class="cd-day cd-soon">10 апр · чт</div>
+                <div class="cd-time">14:30</div>
+              </div>
+              <div class="court-info">
+                <div class="court-num">2-1234/2026</div>
+                <div class="court-case">Смирнова Л.А. · Расторжение брака</div>
+                <div class="court-place">Тушинский р-й суд · Каб. 118 · судья Громов</div>
+              </div>
+              <div class="assignees">
+                <div class="assignee-chip">
+                  <div class="mini-av av-g">АК</div> Аня
+                </div>
+              </div>
+              <a class="court-link" onclick="alert('↗ Открываем дело 2-1234/2026 на ГАС Правосудие')">↗ ГАС Прав.</a>
+            </div>
+            <div class="court-item">
+              <div class="court-date">
+                <div class="cd-day">15 апр · ср</div>
+                <div class="cd-time">09:00</div>
+              </div>
+              <div class="court-info">
+                <div class="court-num">А41-78901/2025</div>
+                <div class="court-case">ИП Коновалов · Налоговый спор</div>
+                <div class="court-place">АС Московской области · Зал 5А</div>
+              </div>
+              <div class="assignees">
+                <div class="assignee-chip">
+                  <div class="mini-av av-v">НА</div> Наталья
+                </div>
+                <div class="assignee-chip">
+                  <div class="mini-av av-o">ДМ</div> Дмитрий
+                </div>
+              </div>
+              <a class="court-link" onclick="alert('↗ kad.arbitr.ru')">↗ Арбитраж</a>
+            </div>
+            <div class="court-item">
+              <div class="court-date">
+                <div class="cd-day">22 апр · ср</div>
+                <div class="cd-time">11:00</div>
+              </div>
+              <div class="court-info">
+                <div class="court-num">3-445/2026</div>
+                <div class="court-case">Захаров П.С. · Взыскание долга</div>
+                <div class="court-place">Савёловский суд · Каб. 22</div>
+              </div>
+              <div class="assignees">
+                <div class="assignee-chip">
+                  <div class="mini-av av-b">СВ</div> Сергей
+                </div>
+              </div>
+              <a class="court-link" onclick="alert('↗ ГАС Правосудие')">↗ ГАС Прав.</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALL ACTIVE TASKS -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">📋 Поручения команды</div>
+            <button class="card-link" onclick="alert('Открываем раздел Поручения...')">Все поручения →</button>
+          </div>
+
+          <!-- tasks from Google Sheets -->
+          <div id="tasks-list">
+          <!-- overdue separator -->
+          <div style="padding:6px 18px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--red);background:rgba(239,68,68,.05);border-bottom:1px solid rgba(239,68,68,.1);">
+            ⚠ Просрочено
+          </div>
+          <div class="task-item">
+            <div class="task-cb"></div>
+            <div class="task-body">
+              <div class="task-title">Написать исковое заявление — дело Петрова А40-12345</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;font-style:italic;">💬 Ждём уточнений от клиента по сумме требований</div>
+              <div class="task-meta">
+                <span class="prio p-h">🔴 Высокий</span>
+                <span class="dl overdue">Срок: 6 апр — просрочено!</span>
+                <div class="task-who"><div class="mini-av av-b" style="width:16px;height:16px;font-size:9px;">СВ</div> Сергей</div>
+              </div>
+            </div>
+            <button class="chip-btn chip-open">Открыть</button>
+          </div>
+          <div class="task-item">
+            <div class="task-cb"></div>
+            <div class="task-body">
+              <div class="task-title">Подготовить возражение на апелляционную жалобу Смирновой</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;font-style:italic;">💬 —</div>
+              <div class="task-meta">
+                <span class="prio p-h">🔴 Высокий</span>
+                <span class="dl overdue">Срок: 6 апр — просрочено!</span>
+                <div class="task-who"><div class="mini-av av-g" style="width:16px;height:16px;font-size:9px;">АК</div> Аня</div>
+              </div>
+            </div>
+            <button class="chip-btn chip-open">Открыть</button>
+          </div>
+
+          <!-- in progress separator -->
+          <div style="padding:6px 18px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--amber);background:rgba(245,158,11,.04);border-top:1px solid var(--border);border-bottom:1px solid rgba(245,158,11,.1);">
+            В работе
+          </div>
+          <div class="task-item">
+            <div class="task-cb"></div>
+            <div class="task-body">
+              <div class="task-title">Запросить выписку из ЕГРН по объекту Коновалова</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;font-style:italic;">💬 Запрос отправлен 2 апр, ждём ответа Росреестра</div>
+              <div class="task-meta">
+                <span class="prio p-m">🟡 Средний</span>
+                <span class="dl">📅 Срок: 12 апр</span>
+                <div class="task-who"><div class="mini-av av-o" style="width:16px;height:16px;font-size:9px;">ДМ</div> Дмитрий</div>
+              </div>
+            </div>
+            <button class="chip-btn chip-open">Открыть</button>
+          </div>
+          <div class="task-item">
+            <div class="task-cb"></div>
+            <div class="task-body">
+              <div class="task-title">Проверить корреспонденцию от суда — дело А41-78901</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;font-style:italic;">💬 —</div>
+              <div class="task-meta">
+                <span class="prio p-m">🟡 Средний</span>
+                <span class="dl">📅 Срок: 15 апр</span>
+                <div class="task-who">
+                  <div class="mini-av av-v" style="width:16px;height:16px;font-size:9px;">НА</div>
+                  <div class="mini-av av-o" style="width:16px;height:16px;font-size:9px;margin-left:-4px;">ДМ</div>
+                  Наталья + Дмитрий
+                </div>
+              </div>
+            </div>
+            <button class="chip-btn chip-open">Открыть</button>
+          </div>
+          <div class="task-item">
+            <div class="task-cb"></div>
+            <div class="task-body">
+              <div class="task-title">Составить мировое соглашение — Захаров П.С.</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;font-style:italic;">💬 —</div>
+              <div class="task-meta">
+                <span class="prio p-l">⚪ Низкий</span>
+                <span class="dl">📅 Срок: 20 апр</span>
+                <div class="task-who"><div class="mini-av av-b" style="width:16px;height:16px;font-size:9px;">СВ</div> Сергей</div>
+              </div>
+            </div>
+            <button class="chip-btn chip-open">Открыть</button>
+          </div>
+          </div><!-- /tasks-list -->
+        </div>
+
+      </div><!-- /left -->
+
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- MINI CALENDAR -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">📅 Апрель 2026</div>
+            <div class="mc-nav"><button>‹</button><button>›</button></div>
+          </div>
+          <div class="mini-cal" style="padding-top:12px;">
+            <div class="cal-grid">
+              <div class="cdow">Пн</div><div class="cdow">Вт</div><div class="cdow">Ср</div>
+              <div class="cdow">Чт</div><div class="cdow">Пт</div><div class="cdow">Сб</div><div class="cdow">Вс</div>
+              <div class="cday other">31</div>
+              <div class="cday">1</div><div class="cday">2</div><div class="cday">3</div>
+              <div class="cday today">4</div><div class="cday">5</div><div class="cday">6</div>
+              <!-- 7 = court -->
+              <div class="cday court has" title="⚖️ А40-12345 · 10:00 · Арбитраж МО" onclick="alert('⚖️ 7 апреля · 10:00\nА40-12345/2026\nАрбитражный суд МО · Зал 312\n👤 Наталья + Сергей')">7</div>
+              <div class="cday">8</div><div class="cday">9</div>
+              <!-- 10 = consult + court -->
+              <div class="cday court has" onclick="alert('⚖️ 10 апреля · 14:30\n2-1234/2026\nТушинский суд · Каб. 118\n👤 Аня')">10</div>
+              <div class="cday">11</div><div class="cday">12</div><div class="cday">13</div>
+              <div class="cday">14</div>
+              <div class="cday court has" onclick="alert('⚖️ 15 апреля · 09:00\nА41-78901/2025\nАС МО · Зал 5А\n👤 Наталья + Дмитрий')">15</div>
+              <div class="cday">16</div><div class="cday">17</div><div class="cday">18</div><div class="cday">19</div><div class="cday">20</div>
+              <div class="cday">21</div>
+              <div class="cday court has" onclick="alert('⚖️ 22 апреля · 11:00\n3-445/2026\nСавёловский суд · Каб. 22\n👤 Сергей')">22</div>
+              <div class="cday">23</div><div class="cday">24</div><div class="cday">25</div><div class="cday">26</div><div class="cday">27</div>
+              <div class="cday">28</div><div class="cday">29</div><div class="cday">30</div>
+              <div class="cday other">1</div><div class="cday other">2</div><div class="cday other">3</div><div class="cday other">4</div>
+            </div>
+            <div class="cal-legend">
+              <div class="leg"><div class="leg-dot" style="background:var(--red)"></div>Суд</div>
+              <div class="leg"><div class="leg-dot" style="background:var(--emerald)"></div>Консультация</div>
+              <div class="leg"><div class="leg-dot" style="background:var(--amber)"></div>Дедлайн</div>
+            </div>
+            <div class="cal-upcoming">
+              <div style="font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Ближайшие</div>
+              <div class="cal-event">
+                <div class="cal-edot" style="background:var(--red)"></div>
+                <div class="cal-einfo">
+                  <div class="cal-etitle">⚖️ А40-12345 Арбитраж МО</div>
+                  <div class="cal-etime">7 апр · пн · 10:00 · Зал 312</div>
+                </div>
+              </div>
+              <div class="cal-event">
+                <div class="cal-edot" style="background:var(--red)"></div>
+                <div class="cal-einfo">
+                  <div class="cal-etitle">⚖️ 2-1234/2026 Тушинский</div>
+                  <div class="cal-etime">10 апр · чт · 14:30</div>
+                </div>
+              </div>
+              <div class="cal-event">
+                <div class="cal-edot" style="background:var(--red)"></div>
+                <div class="cal-einfo">
+                  <div class="cal-etitle">⚖️ А41-78901 АС МО</div>
+                  <div class="cal-etime">15 апр · ср · 09:00</div>
+                </div>
+              </div>
+            </div>
+            <button class="tbtn tbtn-ghost" style="width:100%;margin-top:10px;font-size:12px;" onclick="alert('Открываем полный интерактивный календарь...')">
+              Открыть полный календарь →
+            </button>
+          </div>
+        </div>
+
+        <!-- TELEGRAM BOT -->
+        <div class="card">
+          <div class="tg-card">
+            <div class="tg-head">
+              <div style="font-size:20px">🤖</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:700">Telegram бот</div>
+                <div class="tg-status">● онлайн · @lexdesk_bot</div>
+              </div>
+            </div>
+            <div class="tg-log">✅ Поручение → Дмитрий (8 мин назад)
+✅ Запись → Орлов 16:30 (31 мин назад)
+✅ Суд А40-12345 → Календарь (1 ч)</div>
+            <div class="tg-actions">
+              <div class="tg-btn" onclick="alert('Шаблоны сообщений для бота:\n\n📋 Поручение\nЗапись\n⚖️ Суд')">📋 Шаблоны</div>
+              <div class="tg-btn" onclick="alert('История всех сообщений бота...')">🕐 История</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK STATS — compact, instead of team block -->
+        <div class="card" style="padding:14px 16px;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:12px;color:var(--muted2);text-transform:uppercase;letter-spacing:.6px;">Статус команды</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div class="av av-g" style="width:22px;height:22px;font-size:9px;">АК</div>
+                <span style="font-size:12px;">Аня</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);">2 задачи · до 8 апр</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div class="av av-b" style="width:22px;height:22px;font-size:9px;">СВ</div>
+                <span style="font-size:12px;">Сергей</span>
+              </div>
+              <div style="font-size:11px;color:var(--red);font-weight:600;">1 просрочена!</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <div class="av av-o" style="width:22px;height:22px;font-size:9px;">ДМ</div>
+                <span style="font-size:12px;">Дмитрий</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);">2 задачи · до 15 апр</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right -->
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /page-dash -->
+
+
+<!-- ══════════════════════════════════════════
+     FLOW PAGE
+══════════════════════════════════════════ -->
+<div id="page-flow">
+<div class="flow-wrap">
+  <button class="back-btn" onclick="hideFlow()">← Назад к дашборду</button>
+  <div class="flow-h1">Как работает платформа</div>
+  <div class="flow-sub">Пошаговый процесс: от сообщения в Telegram до кабинета каждого сотрудника</div>
+
+  <!-- STEP 1 -->
+  <div class="fstep">
+    <div class="fconn">
+      <div class="fcirc" style="background:var(--vsoft);border-color:var(--violet);color:#c4b5fd;">1</div>
+      <div class="fline"></div>
+    </div>
+    <div class="fbody">
+      <div class="fstep-label" style="color:var(--violet)">Шаг 1 · Ввод данных</div>
+      <div class="fstep-name">Наталья пишет в Telegram по шаблону</div>
+      <div class="fstep-desc">Никаких новых программ — только привычный Telegram. Наталья или Аня пишут в рабочий чат по простому шаблону. Бот всегда слушает.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">📋 Поручение</div>
+          <div class="fcode">Поручение
+Срок: 15.04.2026
+Задача: Написать иск
+  дело А40-12345
+Исполнитель: Сергей
+Приоритет: высокий</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">🤝 Запись</div>
+          <div class="fcode">Запись
+ФИО: Иванов И.И.
+Телефон: +7 999 123 45 67
+Дата: 10.04.2026
+Время: 14:00
+Адвокат: Наталья
+Суть: Раздел имущества</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">⚖️ Суд</div>
+          <div class="fcode">Суд
+Дело: А40-12345/2026
+Дата: 07.04.2026
+Время: 10:00
+Суд: Арбитраж МО
+Зал: 312
+Ответственные:
+  Наталья, Сергей</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="fstep">
+    <div class="fconn">
+      <div class="fcirc" style="background:var(--bsoft);border-color:var(--blue);color:#93c5fd;">2</div>
+      <div class="fline"></div>
+    </div>
+    <div class="fbody">
+      <div class="fstep-label" style="color:var(--blue)">Шаг 2 · Обработка</div>
+      <div class="fstep-name">Бот мгновенно разбирает сообщение</div>
+      <div class="fstep-desc">За секунды бот определяет тип, извлекает все поля, проверяет исполнителя. Если что-то не так — сразу пишет в чат что именно не понял.</div>
+      <div class="fbox">
+        <div class="fgrid3">
+          <div class="fgrid3-item"><div class="fi">🔍</div><div class="fn">Тип</div><div class="fd">Поручение / Запись / Суд</div></div>
+          <div class="fgrid3-item"><div class="fi">📐</div><div class="fn">Поля</div><div class="fd">Срок, исполнитель, дата, суть</div></div>
+          <div class="fgrid3-item"><div class="fi">✅</div><div class="fn">Ответ в чат</div><div class="fd">Что создано + кто получил</div></div>
+        </div>
+        <div class="fbot-reply">🤖 Бот: Поручение создано ✅
+  → Исполнитель: Сергей (уведомлён в ЛС)
+  → Срок: 15 апреля 2026
+  → Приоритет: 🔴 Высокий
+  → Добавлено в платформу</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="fstep">
+    <div class="fconn">
+      <div class="fcirc" style="background:var(--esoft);border-color:var(--emerald);color:#6ee7b7;">3</div>
+      <div class="fline"></div>
+    </div>
+    <div class="fbody">
+      <div class="fstep-label" style="color:var(--emerald)">Шаг 3 · Разнос данных</div>
+      <div class="fstep-name">Одно сообщение — данные сразу везде</div>
+      <div class="fstep-desc">Больше никакой двойной работы. Написала в Telegram — готово. Всё разошлось автоматически.</div>
+      <div class="fcards">
+        <div class="fcard">
+          <div class="fi">📊</div>
+          <div class="fn">Платформа LexDesk</div>
+          <div class="fd">Задача / суд / запись появляются в нужном разделе. Каждый видит своё.</div>
+        </div>
+        <div class="fcard">
+          <div class="fi">📅</div>
+          <div class="fn">Google Календарь</div>
+          <div class="fd">Событие создаётся в общем рабочем календаре. Все видят в своём Google Calendar.</div>
+        </div>
+        <div class="fcard">
+          <div class="fi">📋</div>
+          <div class="fn">Яндекс.Таблицы</div>
+          <div class="fd">Новая строка добавляется в нужную таблицу автоматически.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="fstep">
+    <div class="fconn">
+      <div class="fcirc" style="background:var(--asoft);border-color:var(--amber);color:#fcd34d;">4</div>
+      <div class="fline"></div>
+    </div>
+    <div class="fbody">
+      <div class="fstep-label" style="color:var(--amber)">Шаг 4 · Личные кабинеты</div>
+      <div class="fstep-name">Каждый заходит и видит только своё</div>
+      <div class="fstep-desc">Сотрудники открывают платформу в браузере. Доступ — по логину и паролю. Никто не видит чужих задач.</div>
+      <div class="froles">
+        <div class="frole" style="background:var(--vsoft);border:1px solid rgba(124,58,237,.2);">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+            <div class="av av-v" style="width:24px;height:24px;font-size:10px;">НА</div>
+            <div class="rn" style="margin:0">Наталья · Администратор</div>
+          </div>
+          <div class="ri">✅ Все задачи всех<br>✅ Весь календарь<br>✅ Все дела и клиенты<br>✅ Закрывает задачи<br>✅ Управление командой</div>
+        </div>
+        <div class="frole" style="background:var(--esoft);border:1px solid rgba(16,185,129,.2);">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+            <div class="av av-g" style="width:24px;height:24px;font-size:10px;">АК</div>
+            <div class="rn" style="margin:0">Аня · Менеджер</div>
+          </div>
+          <div class="ri">✅ Все задачи всех<br>✅ Весь календарь<br>✅ Все дела<br>✅ Закрывает задачи<br>❌ Управление командой</div>
+        </div>
+        <div class="frole" style="background:var(--bsoft);border:1px solid rgba(59,130,246,.2);">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+            <div class="av av-b" style="width:24px;height:24px;font-size:10px;">СВ</div>
+            <div class="rn" style="margin:0">Сергей / Дмитрий · Сотрудник</div>
+          </div>
+          <div class="ri">✅ Только свои задачи<br>✅ Свои суды<br>✅ Свои консультации<br>❌ Закрывать задачи<br>❌ Чужие данные</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="fstep">
+    <div class="fconn">
+      <div class="fcirc" style="background:var(--rsoft);border-color:var(--red);color:#fca5a5;">5</div>
+    </div>
+    <div class="fbody" style="padding-bottom:0;">
+      <div class="fstep-label" style="color:var(--red)">Шаг 5 · Автоуведомления</div>
+      <div class="fstep-name">Система сама напоминает о дедлайнах</div>
+      <div class="fstep-desc">За 2 дня до срока бот пишет исполнителю в Telegram личное сообщение. Наталья и Аня получают утреннюю сводку просроченных задач.</div>
+      <div class="fcode" style="color:#fca5a5;border-color:rgba(239,68,68,.2);">🔔 Сергей, напоминание!
+Задача «Написать иск А40-12345»
+Срок: послезавтра, 15 апр · Приоритет: 🔴 Высокий
+→ lexdesk.ru/tasks/...</div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /page-flow -->
+
+
+<!-- MODAL: Task -->
+<div class="overlay" id="modal-task">
+  <div class="modal">
+    <div class="modal-title">📋 Новое поручение</div>
+    <div class="frow">
+      <label class="flabel">Задача *</label>
+      <input class="finput" placeholder="Написать исковое заявление по делу...">
+    </div>
+    <div class="frow2">
+      <div><label class="flabel">Срок исполнения *</label><input class="finput" type="date"></div>
+      <div><label class="flabel">Приоритет</label>
+        <select class="fselect"><option>🔴 Высокий</option><option selected>🟡 Средний</option><option>⚪ Низкий</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <label class="flabel">Исполнитель</label>
+      <select class="fselect"><option>Сергей В.</option><option>Аня К.</option><option>Дмитрий М.</option><option>Наталья А.</option></select>
+    </div>
+    <div class="frow">
+      <label class="flabel">Примечание</label>
+      <input class="finput" placeholder="Дополнительная информация...">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-c" onclick="closeModal('task')">Отмена</button>
+      <button class="btn-p" onclick="closeModal('task');alert('✅ Поручение создано!\nИсполнитель получит уведомление в Telegram.')">Создать поручение</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Consult -->
+<div class="overlay" id="modal-consult">
+  <div class="modal">
+    <div class="modal-title">🤝 Запись на консультацию</div>
+    <div class="frow">
+      <label class="flabel">ФИО клиента *</label>
+      <input class="finput" placeholder="Иванов Иван Иванович">
+    </div>
+    <div class="frow2">
+      <div><label class="flabel">Телефон</label><input class="finput" placeholder="+7 999 000-00-00"></div>
+      <div><label class="flabel">Адвокат</label>
+        <select class="fselect"><option>Наталья А.</option><option>Сергей В.</option><option>Аня К.</option></select>
+      </div>
+    </div>
+    <div class="frow2">
+      <div><label class="flabel">Дата *</label><input class="finput" type="date"></div>
+      <div><label class="flabel">Время *</label><input class="finput" type="time" value="11:00"></div>
+    </div>
+    <div class="frow">
+      <label class="flabel">Суть вопроса</label>
+      <input class="finput" placeholder="Раздел имущества, трудовой спор...">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-c" onclick="closeModal('consult')">Отмена</button>
+      <button class="btn-p" style="background:#059669;" onclick="closeModal('consult');alert('✅ Консультация записана!\nСобытие добавлено в Google Календарь.\nКлиент будет виден в разделе Консультации.')">Записать клиента</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showFlow(){
+  document.getElementById('page-dash').style.display='none';
+  document.getElementById('page-flow').style.display='block';
+  window.scrollTo(0,0);
+}
+function hideFlow(){
+  document.getElementById('page-dash').style.display='flex';
+  document.getElementById('page-flow').style.display='none';
+}
+function openModal(t){ document.getElementById('modal-'+t).classList.add('open'); }
+function closeModal(t){ document.getElementById('modal-'+t).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
+});
+
+// ── LIVE DATA FROM GOOGLE SHEETS ──────────────────────────────────────
+// Замени на реальный URL твоего Railway-приложения
+const API_URL = '/api/data';
+
+function prioClass(p) {
+  if (!p) return 'p-m';
+  const v = String(p).toLowerCase();
+  if (v === 'высокий') return 'p-h';
+  if (v === 'низкий')  return 'p-l';
+  return 'p-m';
+}
+function prioLabel(p) {
+  if (!p) return '🟡 Средний';
+  const v = String(p).toLowerCase();
+  if (v === 'высокий') return '🔴 Высокий';
+  if (v === 'низкий')  return '⚪ Низкий';
+  return '🟡 Средний';
+}
+function isOverdue(deadline) {
+  if (!deadline) return false;
+  // Формат dd.mm.yyyy
+  const parts = String(deadline).split('.');
+  if (parts.length < 3) return false;
+  const d = new Date(parts[2], parts[1]-1, parts[0]);
+  return d < new Date() && !isNaN(d);
+}
+function today(dateStr) {
+  if (!dateStr) return false;
+  const parts = String(dateStr).split('.');
+  if (parts.length < 2) return false;
+  const now = new Date();
+  return parseInt(parts[0]) === now.getDate() && parseInt(parts[1]) === (now.getMonth()+1);
+}
+
+function renderTasks(tasks) {
+  const el = document.getElementById('tasks-list');
+  if (!el || !tasks || !tasks.length) return;
+
+  const overdue = tasks.filter(t => !t['исполнение'] && isOverdue(t['Срок исполнения'] || t['срок']));
+  const active  = tasks.filter(t => !t['исполнение'] && !isOverdue(t['Срок исполнения'] || t['срок']));
+
+  let html = '';
+
+  if (overdue.length) {
+    html += `<div style="padding:6px 18px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--red);background:rgba(239,68,68,.05);border-bottom:1px solid rgba(239,68,68,.1);">⚠ Просрочено</div>`;
+    overdue.forEach(t => {
+      const title    = t['Задача'] || t['задача'] || '—';
+      const deadline = t['Срок исполнения'] || t['срок'] || '';
+      const assignee = t['Исполнитель'] || t['исполнитель'] || '';
+      const prio     = t['приоритет'] || t['Приоритет'] || 'средний';
+      html += `<div class="task-item">
+        <div class="task-cb"></div>
+        <div class="task-body">
+          <div class="task-title">${title}</div>
+          <div class="task-meta">
+            <span class="prio ${prioClass(prio)}">${prioLabel(prio)}</span>
+            <span class="dl overdue">📅 Срок: ${deadline} — просрочено!</span>
+            <div class="task-who">${assignee}</div>
+          </div>
+        </div>
+        <button class="chip-btn chip-open">Открыть</button>
+      </div>`;
+    });
+  }
+
+  if (active.length) {
+    html += `<div style="padding:6px 18px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--amber);background:rgba(245,158,11,.04);border-top:1px solid var(--border);border-bottom:1px solid rgba(245,158,11,.1);">В работе</div>`;
+    active.forEach(t => {
+      const title    = t['Задача'] || t['задача'] || '—';
+      const deadline = t['Срок исполнения'] || t['срок'] || '';
+      const assignee = t['Исполнитель'] || t['исполнитель'] || '';
+      const prio     = t['приоритет'] || t['Приоритет'] || 'средний';
+      html += `<div class="task-item">
+        <div class="task-cb"></div>
+        <div class="task-body">
+          <div class="task-title">${title}</div>
+          <div class="task-meta">
+            <span class="prio ${prioClass(prio)}">${prioLabel(prio)}</span>
+            <span class="dl">📅 Срок: ${deadline}</span>
+            <div class="task-who">${assignee}</div>
+          </div>
+        </div>
+        <button class="chip-btn chip-open">Открыть</button>
+      </div>`;
+    });
+  }
+
+  if (html) el.innerHTML = html;
+}
+
+function renderConsults(consults) {
+  const el = document.getElementById('consults-list');
+  if (!el || !consults || !consults.length) return;
+
+  const todayItems = consults.filter(c => today(c['дата'] || c['Дата'] || ''));
+  const items = todayItems.length ? todayItems : consults.slice(-5);
+
+  if (!items.length) return;
+
+  const html = items.map(c => {
+    const fio     = c['ФИО'] || c['фио'] || '—';
+    const phone   = c['телефон'] || c['Телефон'] || '';
+    const time    = c['время'] || c['Время'] || '';
+    const subject = c['суть'] || c['Суть'] || c['тема'] || '';
+    const lawyer  = c['адвокат'] || c['Адвокат'] || c['исполнитель'] || '';
+    return `<div class="consult-item">
+      <div>
+        <div class="time-badge time-reg">${time || '—'}</div>
+      </div>
+      <div class="consult-client">
+        <div class="client-name">${fio}</div>
+        <div class="client-sub">${phone}</div>
+      </div>
+      <div class="consult-topic">${subject}</div>
+      <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+        <span style="font-size:11px;color:var(--muted)">${lawyer}</span>
+      </div>
+      <button class="chip-btn chip-open">Детали</button>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = html;
+}
+
+function renderStats(tasks, consults) {
+  const overdueCnt = (tasks||[]).filter(t => !t['исполнение'] && isOverdue(t['Срок исполнения'] || t['срок'])).length;
+  const todayCnt   = (consults||[]).filter(c => today(c['дата'] || c['Дата'] || '')).length;
+
+  // Обновляем баннер
+  const bannerItems = document.querySelectorAll('.today-text .t1');
+  if (bannerItems[0]) bannerItems[0].textContent = todayCnt + ' консультаций';
+  if (bannerItems[2]) {
+    bannerItems[2].textContent = overdueCnt + ' просроченных поручений';
+  }
+}
+
+async function loadData() {
+  try {
+    const res  = await fetch(API_URL);
+    if (!res.ok) return;
+    const data = await res.json();
+    renderTasks(data.tasks   || []);
+    renderConsults(data.consults || []);
+    renderStats(data.tasks, data.consults);
+  } catch(e) {
+    console.warn('LexDesk API недоступен:', e.message);
+  }
+}
+
+// Загружаем данные при старте и каждые 60 сек
+loadData();
+setInterval(loadData, 60000);
+// ──────────────────────────────────────────────────────────────────────
+</script>
+</body>
+</html>

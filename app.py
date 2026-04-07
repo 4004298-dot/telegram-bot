@@ -4,7 +4,8 @@ import time
 import sqlite3
 import logging
 from datetime import datetime
-from flask import Flask, request
+from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS
 import requests
 
 import gspread
@@ -51,6 +52,7 @@ CONSULT_TEMPLATE = (
 # APP
 # =========================================
 app = Flask(__name__)
+CORS(app)
 logging.basicConfig(level=logging.INFO)
 
 # =========================================
@@ -102,7 +104,6 @@ def is_duplicate(update_id: int) -> bool:
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
-    # чистим старое
     cutoff = int(time.time()) - 7 * 24 * 3600
     cur.execute("DELETE FROM processed_updates WHERE created_at < ?", (cutoff,))
 
@@ -144,11 +145,9 @@ def now_str():
 def normalize_date(value: str) -> str:
     value = str(value or "").strip()
 
-    # 20042026 -> 20.04.2026
     if value.isdigit() and len(value) == 8:
         return f"{value[:2]}.{value[2:4]}.{value[4:]}"
 
-    # 20.04 -> 20.04.2026
     if len(value) == 5 and value[2] == ".":
         year = datetime.now().strftime("%Y")
         return f"{value}.{year}"
@@ -179,10 +178,6 @@ def get_sheet_id_by_title(sheet_title: str) -> int:
 
 
 def set_checkbox(sheet_title: str, row_number: int, col_number: int = 1):
-    """
-    Ставит checkbox в ячейку.
-    row_number и col_number - 1-based.
-    """
     sheet_id = get_sheet_id_by_title(sheet_title)
 
     requests_body = {
@@ -248,14 +243,14 @@ def parse_task(chat_id, lines):
     ws = get_worksheet(TASKS_SHEET)
 
     row = [
-        False,          # A чекбокс
-        now_str(),      # B дата постановки
-        deadline,       # C срок
-        "",             # D дата исполнения
-        task,           # E задача
-        "",             # F примечание
-        assignee,       # G исполнитель
-        priority        # H приоритет
+        False,
+        now_str(),
+        deadline,
+        "",
+        task,
+        "",
+        assignee,
+        priority
     ]
 
     ws.append_row(row, value_input_option="USER_ENTERED")
@@ -388,6 +383,27 @@ def webhook():
     except Exception as e:
         app.logger.exception("WEBHOOK ERROR")
         return f"error: {str(e)}", 200
+
+
+@app.route("/api/data", methods=["GET"])
+def api_data():
+    try:
+        tasks_ws    = get_worksheet(TASKS_SHEET)
+        consults_ws = get_worksheet(CONSULTS_SHEET)
+        done_ws     = get_worksheet(DONE_SHEET)
+        return jsonify({
+            "tasks":    tasks_ws.get_all_records(),
+            "consults": consults_ws.get_all_records(),
+            "done":     done_ws.get_all_records(),
+        }), 200
+    except Exception as e:
+        app.logger.exception("api_data error")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/dashboard", methods=["GET"])
+def dashboard():
+    return send_file("dashboard-preview.html")
 
 
 # =========================================
