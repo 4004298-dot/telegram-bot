@@ -730,7 +730,7 @@ function renderTeam() {
 }
 
 function taskCard(t, cls) {
-  const prio = t['Приоритет'] || '';
+  const prio = (t['Приоритет'] || '').toLowerCase();
   const bCls = prio === 'высокий' ? 'b-high' : prio === 'средний' ? 'b-mid' : 'b-low';
   const bIcon = prio === 'высокий' ? '🔴' : prio === 'средний' ? '🟡' : '🟢';
   const deadline = t['Срок исполнения'] || '—';
