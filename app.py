@@ -28,6 +28,7 @@ GOOGLE_SERVICE_ACCOUNT_JSON = os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]
 TASKS_SHEET = os.environ.get("TASKS_SHEET", "Поручения")
 CONSULTS_SHEET = os.environ.get("CONSULTS_SHEET", "Консультации")
 DONE_SHEET = os.environ.get("DONE_SHEET", "Выполнено")
+COURTS_SHEET = os.environ.get("COURTS_SHEET", "Суды")
 GOOGLE_CALENDAR_ID = os.environ.get("GOOGLE_CALENDAR_ID", "")
 
 # Роли: "ADMIN_IDS=111111,222222" — Наталья и Аня
@@ -455,10 +456,17 @@ def api_data():
         tasks_ws    = get_worksheet(TASKS_SHEET)
         consults_ws = get_worksheet(CONSULTS_SHEET)
         done_ws     = get_worksheet(DONE_SHEET)
+        try:
+            courts_ws = get_worksheet(COURTS_SHEET)
+            courts = courts_ws.get_all_records()
+        except Exception:
+            courts = []
+
         return jsonify({
             "tasks":    tasks_ws.get_all_records(),
             "consults": consults_ws.get_all_records(),
             "done":     done_ws.get_all_records(),
+            "courts":   courts,
         }), 200
     except Exception as e:
         app.logger.exception("api_data error")

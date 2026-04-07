@@ -296,7 +296,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);
 
   <div class="bnav" id="bnav-tasks">
     <div class="nt on" onclick="navTo('tasks')"><span class="ic">📋</span>Задачи</div>
-    <div class="nt" onclick="navTo('add')"><span class="ic">➕</span>Добавить</div>
+    <div class="nt" id="nav-add-tasks" onclick="navTo('add')" style="display:none;"><span class="ic">➕</span>Добавить</div>
+    <div class="nt" onclick="navTo('cal')"><span class="ic">📅</span>Календарь</div>
     <div class="nt" id="nav-team-btn" onclick="navTo('team')" style="display:none;"><span class="ic">👥</span>Команда</div>
     <div class="nt" onclick="navTo('notif')"><span class="ic">🔔</span>Уведомления<div class="nt-dot" id="notif-dot" style="display:none;"></div></div>
   </div>
@@ -393,6 +394,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   <div class="bnav">
     <div class="nt" onclick="navTo('tasks')"><span class="ic">📋</span>Задачи</div>
     <div class="nt on" onclick="navTo('add')"><span class="ic">➕</span>Добавить</div>
+    <div class="nt" onclick="navTo('cal')"><span class="ic">📅</span>Календарь</div>
     <div class="nt" id="nav-team-btn2" onclick="navTo('team')" style="display:none;"><span class="ic">👥</span>Команда</div>
     <div class="nt" onclick="navTo('notif')"><span class="ic">🔔</span>Уведомления</div>
   </div>
@@ -429,7 +431,49 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   <div class="bnav">
     <div class="nt" onclick="navTo('tasks')"><span class="ic">📋</span>Задачи</div>
     <div class="nt" onclick="navTo('add')"><span class="ic">➕</span>Добавить</div>
+    <div class="nt" onclick="navTo('cal')"><span class="ic">📅</span>Календарь</div>
     <div class="nt on" onclick="navTo('team')"><span class="ic">👥</span>Команда</div>
+    <div class="nt" onclick="navTo('notif')"><span class="ic">🔔</span>Уведомления</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN: КАЛЕНДАРЬ
+══════════════════════════════════ -->
+<div class="screen" id="s-cal">
+  <div class="safe-top"></div>
+  <div class="topbar">
+    <div class="topbar-left"><h1 id="cal-month-title">Апрель 2026</h1></div>
+    <div style="display:flex;gap:8px;">
+      <div onclick="calPrev()" style="cursor:pointer;font-size:20px;padding:4px 8px;">‹</div>
+      <div onclick="calNext()" style="cursor:pointer;font-size:20px;padding:4px 8px;">›</div>
+    </div>
+  </div>
+
+  <div style="padding:0 16px;flex-shrink:0;">
+    <!-- Дни недели -->
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;">
+      <div style="text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding:4px 0;">Пн</div>
+      <div style="text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding:4px 0;">Вт</div>
+      <div style="text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding:4px 0;">Ср</div>
+      <div style="text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding:4px 0;">Чт</div>
+      <div style="text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding:4px 0;">Пт</div>
+      <div style="text-align:center;font-size:11px;color:var(--red);font-weight:700;padding:4px 0;">Сб</div>
+      <div style="text-align:center;font-size:11px;color:var(--red);font-weight:700;padding:4px 0;">Вс</div>
+    </div>
+    <!-- Сетка дней -->
+    <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:12px;"></div>
+  </div>
+
+  <div class="scroll" id="cal-events" style="padding-top:4px;">
+    <div class="empty"><div class="ico">📅</div><p>Выберите день</p></div>
+  </div>
+
+  <div class="bnav">
+    <div class="nt" onclick="navTo('tasks')"><span class="ic">📋</span>Задачи</div>
+    <div class="nt" onclick="navTo('add')" id="nav-add-cal" style="display:none;"><span class="ic">➕</span>Добавить</div>
+    <div class="nt on" onclick="navTo('cal')"><span class="ic">📅</span>Календарь</div>
+    <div class="nt" id="nav-team-btn3" onclick="navTo('team')" style="display:none;"><span class="ic">👥</span>Команда</div>
     <div class="nt" onclick="navTo('notif')"><span class="ic">🔔</span>Уведомления</div>
   </div>
 </div>
@@ -447,8 +491,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   </div>
   <div class="bnav">
     <div class="nt" onclick="navTo('tasks')"><span class="ic">📋</span>Задачи</div>
-    <div class="nt" onclick="navTo('add')"><span class="ic">➕</span>Добавить</div>
-    <div class="nt" id="nav-team-btn3" onclick="navTo('team')" style="display:none;"><span class="ic">👥</span>Команда</div>
+    <div class="nt" onclick="navTo('add')" id="nav-add-notif" style="display:none;"><span class="ic">➕</span>Добавить</div>
+    <div class="nt" onclick="navTo('cal')"><span class="ic">📅</span>Календарь</div>
+    <div class="nt" id="nav-team-btn4" onclick="navTo('team')" style="display:none;"><span class="ic">👥</span>Команда</div>
     <div class="nt on" onclick="navTo('notif')"><span class="ic">🔔</span>Уведомления</div>
   </div>
 </div>
@@ -466,9 +511,11 @@ const BOT_USERNAME = 'LexDesk_bot'; // замени на реального бо
 // STATE
 // ════════════════════════════════════
 let user = JSON.parse(localStorage.getItem('ld_user') || 'null');
-let allTasks = [], allConsults = [];
+let allTasks = [], allConsults = [], allCourts = [];
 let teamFilter = 'all', teamAssignee = '';
 let selectedPrio = 1;
+let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+let calSelectedDay = null;
 
 // ════════════════════════════════════
 // INIT
@@ -489,14 +536,18 @@ function setTodayDefault() {
 function enterApp() {
   // Показываем нужные вкладки в зависимости от роли
   const isAdmin = user.role === 'admin';
-  ['nav-team-btn','nav-team-btn2','nav-team-btn3'].forEach(id => {
+  ['nav-team-btn','nav-team-btn2','nav-team-btn3','nav-team-btn4'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = isAdmin ? 'flex' : 'none';
   });
 
-  // Только admin видит исполнителя (юрист видит только свои)
+  // Только admin видит исполнителя и кнопку Добавить
   const af = document.getElementById('assignee-field');
   if (af) af.style.display = isAdmin ? 'block' : 'none';
+  ['nav-add-tasks','nav-add-cal','nav-add-notif'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isAdmin ? 'flex' : 'none';
+  });
 
   // Аватар
   const initials = (user.name || 'АА').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
@@ -604,7 +655,7 @@ function showLogout() {
 // ════════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════════
-const screenMap = {tasks:'s-tasks', add:'s-add', team:'s-team', notif:'s-notif'};
+const screenMap = {tasks:'s-tasks', add:'s-add', team:'s-team', cal:'s-cal', notif:'s-notif'};
 
 function navTo(tab) {
   // Hide all screens
@@ -613,6 +664,7 @@ function navTo(tab) {
 
   if (tab === 'tasks') loadData();
   if (tab === 'team')  renderTeam();
+  if (tab === 'cal')   renderCalendar();
 }
 
 function show(id) {
@@ -629,8 +681,10 @@ async function loadData() {
     const data = await res.json();
     allTasks = data.tasks || [];
     allConsults = data.consults || [];
+    allCourts = data.courts || [];
     renderMyTasks();
     renderTeam();
+    renderCalendar();
   } catch(e) {
     document.getElementById('tasks-body').innerHTML =
       '<div class="empty"><div class="ico">⚠️</div><p>Не удалось загрузить данные</p></div>';
@@ -895,6 +949,150 @@ function parseDate(val) {
   const m2 = s.match(/^(\d{2})\.(\d{2})$/);
   if (m2) return new Date(new Date().getFullYear(), +m2[2]-1, +m2[1]);
   return null;
+}
+
+// ════════════════════════════════════
+// CALENDAR
+// ════════════════════════════════════
+const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+  'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+function calPrev() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function calNext() { calMonth++; if (calMonth > 11) { calMonth = 0;  calYear++; } renderCalendar(); }
+
+function getEventsForDate(dateStr) {
+  // dateStr = "YYYY-MM-DD"
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const target = new Date(y,m-1,d);
+  const isAdmin = user && user.role === 'admin';
+  const events = [];
+
+  // Задачи — дедлайны
+  allTasks.forEach(t => {
+    const done = String(t['исполнение']||'').toUpperCase();
+    if (['TRUE','ИСТИНА','1'].includes(done)) return;
+    const dt = parseDate(t['Срок исполнения']);
+    if (!dt) return;
+    if (dt.toDateString() !== target.toDateString()) return;
+    if (!isAdmin && t['Исполнитель'] !== user?.name) return;
+    events.push({type:'task', label: t['Задача']||'Задача', sub: t['Исполнитель']||'', prio: (t['Приоритет']||'').toLowerCase()});
+  });
+
+  // Консультации (только admin)
+  if (isAdmin) {
+    allConsults.forEach(c => {
+      const dt = parseDate(c['Дата']);
+      if (!dt) return;
+      if (dt.toDateString() !== target.toDateString()) return;
+      events.push({type:'consult', label: c['ФИО']||'Консультация', sub: (c['Время']||'') + (c['Адвокат'] ? ' · ' + c['Адвокат'] : '')});
+    });
+  }
+
+  // Суды
+  allCourts.forEach(c => {
+    const dateField = c['Дата'] || c['дата'] || c['date'] || '';
+    const dt = parseDate(String(dateField));
+    if (!dt) return;
+    if (dt.toDateString() !== target.toDateString()) return;
+    const title = c['Дело'] || c['дело'] || c['Название'] || c['название'] || 'Судебное заседание';
+    const sub = c['Время'] || c['время'] || '';
+    events.push({type:'court', label: title, sub});
+  });
+
+  return events;
+}
+
+function renderCalendar() {
+  document.getElementById('cal-month-title').textContent = `${MONTHS_RU[calMonth]} ${calYear}`;
+
+  const grid = document.getElementById('cal-grid');
+  const today = todayDate();
+  const firstDay = new Date(calYear, calMonth, 1);
+  // Пн=0...Вс=6
+  let startDow = firstDay.getDay() - 1; if (startDow < 0) startDow = 6;
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+
+  let html = '';
+  // Пустые ячейки до начала
+  for (let i = 0; i < startDow; i++) html += '<div></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const events  = getEventsForDate(dateStr);
+    const isToday = new Date(calYear, calMonth, d).toDateString() === today.toDateString();
+    const isSel   = calSelectedDay === dateStr;
+    const dow = (startDow + d - 1) % 7; // 0=пн..6=вс
+    const isWeekend = dow >= 5;
+
+    // Цветные точки
+    const hasTask    = events.some(e => e.type === 'task');
+    const hasConsult = events.some(e => e.type === 'consult');
+    const hasCourt   = events.some(e => e.type === 'court');
+
+    let dots = '';
+    if (hasTask)    dots += `<span style="width:5px;height:5px;border-radius:50%;background:var(--violet);display:inline-block;margin:0 1px;"></span>`;
+    if (hasConsult) dots += `<span style="width:5px;height:5px;border-radius:50%;background:var(--emerald);display:inline-block;margin:0 1px;"></span>`;
+    if (hasCourt)   dots += `<span style="width:5px;height:5px;border-radius:50%;background:var(--red);display:inline-block;margin:0 1px;"></span>`;
+
+    const bgColor = isSel ? 'var(--violet)' : isToday ? 'var(--vsoft)' : 'transparent';
+    const textColor = isSel ? '#fff' : isWeekend ? 'var(--red)' : 'var(--text)';
+    const border = isToday && !isSel ? '1px solid rgba(124,58,237,.4)' : '1px solid transparent';
+
+    html += `<div onclick="calSelectDay('${dateStr}')" style="
+      cursor:pointer;text-align:center;border-radius:10px;padding:6px 2px;
+      background:${bgColor};border:${border};">
+      <div style="font-size:15px;font-weight:${isToday||isSel?700:400};color:${textColor};">${d}</div>
+      <div style="display:flex;justify-content:center;min-height:6px;margin-top:2px;">${dots}</div>
+    </div>`;
+  }
+  grid.innerHTML = html;
+
+  if (calSelectedDay) renderCalEvents(calSelectedDay);
+}
+
+function calSelectDay(dateStr) {
+  calSelectedDay = dateStr;
+  renderCalendar();
+}
+
+function renderCalEvents(dateStr) {
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const label = `${d} ${['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'][m-1]}`;
+  const events = getEventsForDate(dateStr);
+  const el = document.getElementById('cal-events');
+
+  if (!events.length) {
+    el.innerHTML = `<div class="empty"><div class="ico">✅</div><p>${label} — событий нет</p></div>`;
+    return;
+  }
+
+  let html = `<div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:12px;">${label}</div>`;
+
+  events.forEach(e => {
+    let ico, color, bg;
+    if (e.type === 'task') {
+      const p = e.prio;
+      ico = p==='высокий'?'🔴':p==='средний'?'🟡':'🟢';
+      color = p==='высокий'?'var(--red)':p==='средний'?'var(--amber)':'var(--emerald)';
+      bg = p==='высокий'?'var(--rsoft)':p==='средний'?'var(--asoft)':'var(--esoft)';
+    } else if (e.type === 'consult') {
+      ico = '📅'; color = 'var(--emerald)'; bg = 'var(--esoft)';
+    } else {
+      ico = '⚖️'; color = 'var(--red)'; bg = 'var(--rsoft)';
+    }
+
+    html += `<div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
+      padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center;">
+      <div style="width:40px;height:40px;border-radius:12px;background:${bg};
+        display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${ico}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:3px;">${e.label}</div>
+        ${e.sub ? `<div style="font-size:12px;color:var(--muted);">${e.sub}</div>` : ''}
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
 }
 
 function showToast(msg) {
