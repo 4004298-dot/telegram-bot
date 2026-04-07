@@ -25,6 +25,7 @@ GOOGLE_SERVICE_ACCOUNT_JSON = os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]
 TASKS_SHEET = os.environ.get("TASKS_SHEET", "Поручения")
 CONSULTS_SHEET = os.environ.get("CONSULTS_SHEET", "Консультации")
 DONE_SHEET = os.environ.get("DONE_SHEET", "Выполнено")
+GOOGLE_CALENDAR_ID = os.environ.get("GOOGLE_CALENDAR_ID", "")
 
 BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
@@ -64,15 +65,17 @@ def build_google_clients():
     scopes = [
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive",
+        "https://www.googleapis.com/auth/calendar",
     ]
 
     creds = Credentials.from_service_account_info(info, scopes=scopes)
     gc = gspread.authorize(creds)
     sheets_service = build("sheets", "v4", credentials=creds, cache_discovery=False)
-    return gc, sheets_service
+    calendar_service = build("calendar", "v3", credentials=creds, cache_discovery=False)
+    return gc, sheets_service, calendar_service
 
 
-gc, sheets_service = build_google_clients()
+gc, sheets_service, calendar_service = build_google_clients()
 
 
 # =========================================
@@ -210,6 +213,44 @@ def set_checkbox(sheet_title: str, row_number: int, col_number: int = 1):
 
 
 # =========================================
+# GOOGLE CALENDAR
+# =========================================
+def add_calendar_event(date: str, tm: str, fio: str, phone: str, subject: str, lawyer: str):
+    if not GOOGLE_CALENDAR_ID:
+        return
+    try:
+        # date like "20.04.2026" or "20.04", tm like "14:30"
+        parts = date.split(".")
+        if len(parts) == 2:
+            year = datetime.now().strftime("%Y")
+            date = f"{parts[0]}.{parts[1]}.{year}"
+            parts = date.split(".")
+
+        day, month, year = parts[0], parts[1], parts[2]
+        hour, minute = (tm.split(":") if tm and ":" in tm else ("10", "00"))
+
+        start_dt = f"{year}-{month}-{day}T{hour}:{minute}:00"
+        # end = start + 1 hour
+        end_hour = str(int(hour) + 1).zfill(2)
+        end_dt = f"{year}-{month}-{day}T{end_hour}:{minute}:00"
+
+        event = {
+            "summary": f"Консультация: {fio}",
+            "description": f"Телефон: {phone}\nТема: {subject}\nАдвокат: {lawyer}",
+            "start": {"dateTime": start_dt, "timeZone": TIMEZONE_LABEL},
+            "end":   {"dateTime": end_dt,   "timeZone": TIMEZONE_LABEL},
+        }
+
+        calendar_service.events().insert(
+            calendarId=GOOGLE_CALENDAR_ID,
+            body=event
+        ).execute()
+        app.logger.info("Calendar event created: %s %s", fio, start_dt)
+    except Exception:
+        app.logger.exception("Calendar event creation failed")
+
+
+# =========================================
 # BUSINESS LOGIC
 # =========================================
 def show_help(chat_id):
@@ -303,6 +344,8 @@ def parse_consult(chat_id, lines):
 
     ws.append_row(row, value_input_option="USER_ENTERED")
     row_number = len(ws.get_all_values())
+
+    add_calendar_event(date, tm, fio, phone, subject, lawyer)
 
     send_message(
         chat_id,
