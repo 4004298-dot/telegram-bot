@@ -365,7 +365,7 @@ def handle_text_message(chat_id, text):
     if not text:
         return
 
-    if text in ["/start", "/help", "/помощь"]:
+    if text.lower() in ["/start", "/help", "/помощь", "старт", "start", "помощь"]:
         show_help(chat_id)
         return
 
