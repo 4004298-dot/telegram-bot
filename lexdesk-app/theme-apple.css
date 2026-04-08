@@ -71,6 +71,17 @@ html, body {
   font-weight: 700;
 }
 
+/* Бейджи адвокатов — фиолетовый Apple */
+.c-lawyer {
+  background: rgba(88,86,214,0.10) !important;
+  color: var(--violet) !important;
+}
+
+/* Активная вкладка — фиолетовый Apple */
+.nt.on {
+  color: var(--violet) !important;
+}
+
 /* Навигация — белая с blur */
 .bnav {
   background: rgba(255,255,255,0.95) !important;

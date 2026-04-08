@@ -8,7 +8,6 @@
 <meta name="theme-color" content="#09090b">
 <title>LexDesk</title>
 <link rel="manifest" href="/lexdesk-app/manifest.json">
-<link rel="stylesheet" id="app-theme" href="/lexdesk-app/theme-dark.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -126,13 +125,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);
 .consult-card{background:var(--s1);border:1px solid var(--border);
   border-radius:var(--r);padding:14px;margin-bottom:10px;
   display:flex;gap:12px;align-items:center;}
-.c-time{background:var(--vsoft);color:#c4b5fd;border-radius:10px;
+.c-time{background:var(--vsoft);color:var(--violet);border-radius:10px;
   padding:8px 10px;font-size:15px;font-weight:700;text-align:center;
   min-width:54px;flex-shrink:0;}
 .c-info{flex:1;min-width:0;}
 .c-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .c-sub{font-size:12px;color:var(--muted);margin-top:3px;}
-.c-lawyer{font-size:11px;color:#a78bfa;background:var(--vsoft);
+.c-lawyer{font-size:11px;color:var(--violet);background:var(--vsoft);
   padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
 
 /* ══════════════════════════════════
@@ -153,7 +152,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);
 .nt{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
   font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;
   padding:4px 0;position:relative;}
-.nt.on{color:#c4b5fd;}
+.nt.on{color:var(--violet);}
 .nt .ic{font-size:22px;line-height:1;}
 .nt-dot{position:absolute;top:2px;right:calc(50% - 18px);
   width:8px;height:8px;border-radius:50%;background:var(--red);}
@@ -226,6 +225,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 </style>
+<link rel="stylesheet" id="app-theme" href="/lexdesk-app/theme-dark.css">
 </head>
 <body>
 

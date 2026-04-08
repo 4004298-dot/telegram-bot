@@ -42,11 +42,21 @@ html, body {
   padding: 16px;
 }
 
-/* Время консультации — нейтральный фон вместо яркого фиолетового */
+/* Время консультации — нейтральный фон, без фиолетового */
 .c-time {
   background: var(--s3) !important;
   color: var(--text) !important;
-  border-radius: 10px;
+}
+
+/* Бейджи адвокатов — нейтральные, не фиолетовые */
+.c-lawyer {
+  background: var(--s3) !important;
+  color: var(--muted) !important;
+}
+
+/* Активная вкладка навигации — мягкий белый вместо фиолетового */
+.nt.on {
+  color: #ffffff !important;
 }
 
 /* Навигация — чище */
