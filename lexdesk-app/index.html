@@ -683,17 +683,21 @@ function show(id) {
 async function loadData() {
   try {
     const res = await fetch(`${API}/api/data`);
+    if (!res.ok) return;
     const data = await res.json();
-    allTasks = data.tasks || [];
-    allConsults = data.consults || [];
-    allCourts = data.courts || [];
+
+    // Не заменяем данные пустыми — если пришло пусто, оставляем старое
+    if (data.tasks && data.tasks.length)    allTasks    = data.tasks;
+    if (data.consults && data.consults.length) allConsults = data.consults;
+    if (data.courts)  allCourts  = data.courts;
+
     renderMyTasks();
     renderTeam();
     renderCalendar();
     if (calSelectedDay) renderCalEvents(calSelectedDay);
   } catch(e) {
-    document.getElementById('tasks-body').innerHTML =
-      '<div class="empty"><div class="ico">⚠️</div><p>Не удалось загрузить данные</p></div>';
+    // Сеть упала — не трогаем экран, ждём следующего цикла
+    console.warn('loadData error:', e);
   }
 }
 
