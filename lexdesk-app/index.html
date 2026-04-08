@@ -371,7 +371,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);
         </div>
         <div class="field" style="flex:1;">
           <label>Время</label>
-          <input type="time" id="f-ctime">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="f-ctime" placeholder="14:30"
+              maxlength="5" inputmode="numeric"
+              style="flex:1;font-size:20px;font-weight:700;letter-spacing:2px;text-align:center;"
+              oninput="formatTimeInput(this)"
+              onfocus="this.select()">
+            <button type="button" onclick="clearTime()"
+              style="padding:14px 12px;background:var(--s2);border:1px solid var(--border);
+              border-radius:12px;color:var(--muted);font-size:13px;font-weight:600;
+              cursor:pointer;white-space:nowrap;flex-shrink:0;">
+              Изменить
+            </button>
+          </div>
         </div>
       </div>
       <div class="field">
@@ -887,7 +899,7 @@ async function submitConsult() {
   const fio     = document.getElementById('f-fio').value.trim();
   const phone   = document.getElementById('f-phone').value.trim();
   const cdate   = document.getElementById('f-cdate').value;
-  const ctime   = document.getElementById('f-ctime').value;
+  const ctime   = document.getElementById('f-ctime').value.trim();
   const subject = document.getElementById('f-subject').value.trim();
   const lawyer  = document.getElementById('f-clawyer').value;
 
@@ -1103,6 +1115,24 @@ function renderCalEvents(dateStr) {
   });
 
   el.innerHTML = html;
+}
+
+// ════════════════════════════════════
+// TIME INPUT HELPERS
+// ════════════════════════════════════
+function formatTimeInput(el) {
+  let val = el.value.replace(/\D/g, ''); // только цифры
+  if (val.length > 4) val = val.slice(0, 4);
+  if (val.length >= 3) {
+    val = val.slice(0, 2) + ':' + val.slice(2);
+  }
+  el.value = val;
+}
+
+function clearTime() {
+  const el = document.getElementById('f-ctime');
+  el.value = '';
+  el.focus();
 }
 
 function showToast(msg) {
