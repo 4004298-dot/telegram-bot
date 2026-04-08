@@ -1,0 +1,190 @@
+/* ═══════════════════════════════════
+   ТЕМА: Apple / Light
+   Светлая, чистая, минималистичная
+═══════════════════════════════════ */
+:root {
+  --bg:      #f2f2f7;
+  --s1:      #ffffff;
+  --s2:      #f2f2f7;
+  --s3:      #e5e5ea;
+  --border:  rgba(0,0,0,0.08);
+  --violet:  #5856d6;
+  --vsoft:   rgba(88,86,214,0.08);
+  --emerald: #34c759;
+  --esoft:   rgba(52,199,89,0.10);
+  --amber:   #ff9500;
+  --asoft:   rgba(255,149,0,0.10);
+  --red:     #ff3b30;
+  --rsoft:   rgba(255,59,48,0.08);
+  --text:    #1c1c1e;
+  --muted:   #8e8e93;
+  --muted2:  #aeaeb2;
+  --r:       14px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+}
+
+/* Все экраны — светлый фон */
+.screen {
+  background: var(--bg) !important;
+}
+
+/* Карточки — белые с тенью вместо тёмных */
+.task-card {
+  background: #ffffff !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  margin-bottom: 10px;
+  padding: 16px;
+}
+
+.task-card.over {
+  background: #fff5f5 !important;
+  border-left: 3px solid var(--red) !important;
+}
+
+.task-card.today {
+  background: #fffbf0 !important;
+  border-left: 3px solid var(--amber) !important;
+}
+
+.consult-card {
+  background: #ffffff !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  margin-bottom: 10px;
+  padding: 16px;
+}
+
+/* Время консультации — синий Apple */
+.c-time {
+  background: #e8e8fd !important;
+  color: var(--violet) !important;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+/* Навигация — белая с blur */
+.bnav {
+  background: rgba(255,255,255,0.95) !important;
+  border-top: 1px solid rgba(0,0,0,0.08) !important;
+}
+
+.nt {
+  color: var(--muted) !important;
+  font-size: 10px;
+  letter-spacing: 0.2px;
+}
+
+.nt.on {
+  color: var(--violet) !important;
+}
+
+/* Статистика */
+.stat-card {
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  border-radius: 16px !important;
+}
+
+.stat-card.danger .num { color: var(--red) !important; }
+.stat-card.warn .num   { color: var(--amber) !important; }
+.stat-card.ok .num     { color: var(--emerald) !important; }
+.stat-card .lbl        { color: var(--muted) !important; }
+
+/* Топбар */
+.topbar-left h1 {
+  color: var(--text) !important;
+  font-weight: 700;
+}
+
+.topbar-left p {
+  color: var(--muted) !important;
+}
+
+/* Поля форм */
+.field input, .field textarea, .field select {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.10) !important;
+  color: var(--text) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.field input:focus, .field textarea:focus {
+  border-color: var(--violet) !important;
+  box-shadow: 0 0 0 3px rgba(88,86,214,0.12) !important;
+}
+
+.field label { color: var(--muted) !important; }
+
+/* Переключатель сегмента */
+.seg {
+  background: rgba(0,0,0,0.06) !important;
+  border-radius: 12px;
+}
+
+.seg-btn { color: var(--muted) !important; }
+.seg-btn.on {
+  background: #ffffff !important;
+  color: var(--text) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+/* Кнопка отправки */
+.btn-submit {
+  background: var(--violet) !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(88,86,214,0.3) !important;
+}
+
+/* Приоритеты */
+.prio-opt { border-radius: 12px; }
+
+/* Секция заголовок */
+.sec h3 { color: var(--text) !important; font-weight: 700; }
+
+/* Бейджи приоритетов */
+.b-high { background: rgba(255,59,48,0.10) !important; color: var(--red) !important; }
+.b-mid  { background: rgba(255,149,0,0.10) !important; color: var(--amber) !important; }
+.b-low  { background: rgba(52,199,89,0.10) !important; color: var(--emerald) !important; }
+
+/* Чипы фильтров */
+.chip {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  color: var(--muted) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.chip.on {
+  background: var(--violet) !important;
+  border-color: var(--violet) !important;
+  color: #ffffff !important;
+}
+
+/* Логин */
+#s-login {
+  background: linear-gradient(160deg, #f0efff 0%, #f2f2f7 60%) !important;
+}
+
+.login-title { color: var(--text) !important; }
+.login-sub   { color: var(--muted) !important; }
+
+/* Avatar */
+.avatar {
+  background: linear-gradient(135deg, var(--violet), #8b85ff) !important;
+}
+
+/* Toast */
+.toast {
+  background: #1c1c1e !important;
+  color: #ffffff !important;
+}

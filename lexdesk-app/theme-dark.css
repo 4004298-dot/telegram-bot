@@ -1,0 +1,97 @@
+/* ═══════════════════════════════════
+   ТЕМА: Dark Pro (улучшенная тёмная)
+   Два акцента: фиолетовый + красный
+═══════════════════════════════════ */
+:root {
+  --bg:      #09090b;
+  --s1:      #111113;
+  --s2:      #1c1c1f;
+  --s3:      #2c2c2f;
+  --border:  rgba(255,255,255,0.07);
+  --violet:  #7c3aed;
+  --vsoft:   rgba(124,58,237,0.12);
+  --emerald: #10b981;
+  --esoft:   rgba(16,185,129,0.10);
+  --amber:   #f59e0b;
+  --asoft:   rgba(245,158,11,0.10);
+  --red:     #ef4444;
+  --rsoft:   rgba(239,68,68,0.10);
+  --text:    #f5f5f5;
+  --muted:   #6b6b72;
+  --muted2:  #48484f;
+  --r:       14px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+}
+
+/* Карточки — меньше цвета, больше воздуха */
+.task-card {
+  border-radius: 16px;
+  margin-bottom: 12px;
+  padding: 16px;
+}
+
+.consult-card {
+  border-radius: 16px;
+  margin-bottom: 12px;
+  padding: 16px;
+}
+
+/* Время консультации — нейтральный фон вместо яркого фиолетового */
+.c-time {
+  background: var(--s3) !important;
+  color: var(--text) !important;
+  border-radius: 10px;
+}
+
+/* Навигация — чище */
+.bnav {
+  background: rgba(12, 12, 14, 0.97) !important;
+  border-top: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+.nt {
+  font-size: 10px;
+  letter-spacing: 0.3px;
+}
+
+/* Статистика — убрать цветные фоны, оставить только цифру */
+.stat-card {
+  background: var(--s1) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+}
+
+/* Кнопка отправки */
+.btn-submit {
+  border-radius: 16px;
+  letter-spacing: 0.3px;
+}
+
+/* Чипы фильтров */
+.chip {
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+/* Переключатель тем */
+.theme-switcher {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 44px) + 8px);
+  right: 72px;
+  z-index: 999;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  display: none;
+}

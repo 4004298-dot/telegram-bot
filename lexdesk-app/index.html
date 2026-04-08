@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#09090b">
 <title>LexDesk</title>
 <link rel="manifest" href="/lexdesk-app/manifest.json">
+<link rel="stylesheet" id="app-theme" href="/lexdesk-app/theme-dark.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -282,7 +283,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);
       <h1 id="tasks-title">Мои задачи</h1>
       <p id="tasks-date"></p>
     </div>
-    <div class="avatar" id="user-avatar" onclick="showLogout()">АА</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div id="theme-btn" onclick="switchTheme()" style="background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;">🌙 Тема</div>
+      <div class="avatar" id="user-avatar" onclick="showLogout()">АА</div>
+    </div>
   </div>
 
   <div class="scroll" id="tasks-scroll">
@@ -544,6 +548,26 @@ function setTodayDefault() {
   if (document.getElementById('f-deadline')) document.getElementById('f-deadline').value = today;
   if (document.getElementById('f-cdate')) document.getElementById('f-cdate').value = today;
 }
+
+// ════════════════════════════════════
+// ТЕМА
+// ════════════════════════════════════
+function switchTheme() {
+  const link = document.getElementById('app-theme');
+  const isDark = link.href.includes('theme-dark');
+  const newTheme = isDark ? 'theme-apple' : 'theme-dark';
+  link.href = `/lexdesk-app/${newTheme}.css`;
+  localStorage.setItem('ld_theme', newTheme);
+  const btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = isDark ? '🌙 Тема' : '☀️ Тема';
+}
+function initTheme() {
+  const saved = localStorage.getItem('ld_theme') || 'theme-dark';
+  document.getElementById('app-theme').href = `/lexdesk-app/${saved}.css`;
+  const btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = saved === 'theme-dark' ? '🌙 Тема' : '☀️ Тема';
+}
+initTheme();
 
 function enterApp() {
   // Показываем нужные вкладки в зависимости от роли
