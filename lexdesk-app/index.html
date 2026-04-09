@@ -125,13 +125,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);
 .consult-card{background:var(--s1);border:1px solid var(--border);
   border-radius:var(--r);padding:14px;margin-bottom:10px;
   display:flex;gap:12px;align-items:center;}
-.c-time{background:var(--vsoft);color:var(--violet);border-radius:10px;
+.c-time{background:var(--s3);color:var(--muted);border-radius:10px;
   padding:8px 10px;font-size:15px;font-weight:700;text-align:center;
   min-width:54px;flex-shrink:0;}
 .c-info{flex:1;min-width:0;}
 .c-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .c-sub{font-size:12px;color:var(--muted);margin-top:3px;}
-.c-lawyer{font-size:11px;color:var(--violet);background:var(--vsoft);
+.c-lawyer{font-size:11px;color:var(--muted);background:var(--s2);
   padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
 
 /* ══════════════════════════════════
@@ -195,7 +195,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);
 .chips::-webkit-scrollbar{display:none;}
 .chip{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;white-space:nowrap;
   background:var(--s1);border:1px solid var(--border);color:var(--muted);cursor:pointer;flex-shrink:0;}
-.chip.on{background:var(--vsoft);border-color:rgba(124,58,237,.4);color:#c4b5fd;}
+.chip.on{background:var(--vsoft);border-color:rgba(124,58,237,.4);color:var(--violet);}
 
 /* ══════════════════════════════════
    NOTIF CARD
@@ -224,8 +224,48 @@ html,body{height:100%;background:var(--bg);color:var(--text);
 .loader{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);
   border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+/* ══════════════════════════════════
+   APPLE LIGHT THEME
+══════════════════════════════════ */
+[data-theme="apple"]{
+  --bg:#f2f2f7;--s1:#ffffff;--s2:#f2f2f7;--s3:#e5e5ea;
+  --border:rgba(0,0,0,0.09);
+  --violet:#5856d6;--vsoft:rgba(88,86,214,0.11);
+  --emerald:#34c759;--esoft:rgba(52,199,89,0.12);
+  --amber:#ff9500;--asoft:rgba(255,149,0,0.12);
+  --red:#ff3b30;--rsoft:rgba(255,59,48,0.12);
+  --text:#1c1c1e;--muted:#8e8e93;--muted2:#aeaeb2;
+}
+[data-theme="apple"] html,
+[data-theme="apple"] body{background:var(--bg);color:var(--text);}
+[data-theme="apple"] .screen{background:var(--bg);}
+[data-theme="apple"] #s-login{background:linear-gradient(160deg,#ececf5 0%,var(--bg) 65%);}
+[data-theme="apple"] .bnav{
+  background:rgba(255,255,255,0.92);
+  border-top-color:rgba(0,0,0,0.12);}
+[data-theme="apple"] .task-card{
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);border-color:var(--border);}
+[data-theme="apple"] .consult-card{
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);border-color:var(--border);}
+[data-theme="apple"] .stat-card{
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);border-color:var(--border);}
+[data-theme="apple"] .c-time{
+  background:var(--vsoft);color:var(--violet);}
+[data-theme="apple"] .c-lawyer{
+  background:var(--vsoft);color:var(--violet);}
+[data-theme="apple"] .nt.on{color:var(--violet);}
+[data-theme="apple"] .seg-btn.on{background:var(--violet);}
+[data-theme="apple"] .btn-submit{
+  background:linear-gradient(135deg,var(--violet),#7b79e8);}
+[data-theme="apple"] .field input:focus,
+[data-theme="apple"] .field textarea:focus,
+[data-theme="apple"] .field select:focus{
+  border-color:rgba(88,86,214,.4);}
+[data-theme="apple"] .toast{
+  background:#ffffff;color:#1c1c1e;
+  box-shadow:0 4px 20px rgba(0,0,0,0.12);}
 </style>
-<link rel="stylesheet" id="app-theme" href="/lexdesk-app/theme-dark.css">
 </head>
 <body>
 
@@ -553,19 +593,30 @@ function setTodayDefault() {
 // ТЕМА
 // ════════════════════════════════════
 function switchTheme() {
-  const link = document.getElementById('app-theme');
-  const isDark = link.href.includes('theme-dark');
-  const newTheme = isDark ? 'theme-apple' : 'theme-dark';
-  link.href = `/lexdesk-app/${newTheme}.css`;
+  const html = document.documentElement;
+  const isApple = html.getAttribute('data-theme') === 'apple';
+  const newTheme = isApple ? 'dark' : 'apple';
+  if (newTheme === 'apple') {
+    html.setAttribute('data-theme', 'apple');
+  } else {
+    html.removeAttribute('data-theme');
+  }
   localStorage.setItem('ld_theme', newTheme);
   const btn = document.getElementById('theme-btn');
-  if (btn) btn.textContent = isDark ? '🌙 Тема' : '☀️ Тема';
+  if (btn) btn.textContent = newTheme === 'apple' ? '🌙 Тема' : '☀️ Тема';
+  // Обновить theme-color для браузера
+  const mc = document.querySelector('meta[name="theme-color"]');
+  if (mc) mc.content = newTheme === 'apple' ? '#f2f2f7' : '#09090b';
 }
 function initTheme() {
-  const saved = localStorage.getItem('ld_theme') || 'theme-dark';
-  document.getElementById('app-theme').href = `/lexdesk-app/${saved}.css`;
+  const saved = localStorage.getItem('ld_theme') || 'dark';
+  if (saved === 'apple') {
+    document.documentElement.setAttribute('data-theme', 'apple');
+    const mc = document.querySelector('meta[name="theme-color"]');
+    if (mc) mc.content = '#f2f2f7';
+  }
   const btn = document.getElementById('theme-btn');
-  if (btn) btn.textContent = saved === 'theme-dark' ? '🌙 Тема' : '☀️ Тема';
+  if (btn) btn.textContent = saved === 'apple' ? '🌙 Тема' : '☀️ Тема';
 }
 initTheme();
 
