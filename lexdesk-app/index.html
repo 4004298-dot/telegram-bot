@@ -228,7 +228,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);
 /* ══════════════════════════════════
    APPLE LIGHT THEME
 ══════════════════════════════════ */
-[data-theme="apple"]{
+html[data-theme="apple"]{
   --bg:#f2f2f7;--s1:#ffffff;--s2:#f2f2f7;--s3:#e5e5ea;
   --border:rgba(0,0,0,0.09);
   --violet:#5856d6;--vsoft:rgba(88,86,214,0.11);
@@ -237,33 +237,35 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   --red:#ff3b30;--rsoft:rgba(255,59,48,0.12);
   --text:#1c1c1e;--muted:#8e8e93;--muted2:#aeaeb2;
 }
-[data-theme="apple"] html,
-[data-theme="apple"] body{background:var(--bg);color:var(--text);}
-[data-theme="apple"] .screen{background:var(--bg);}
-[data-theme="apple"] #s-login{background:linear-gradient(160deg,#ececf5 0%,var(--bg) 65%);}
-[data-theme="apple"] .bnav{
-  background:rgba(255,255,255,0.92);
-  border-top-color:rgba(0,0,0,0.12);}
-[data-theme="apple"] .task-card{
-  box-shadow:0 1px 4px rgba(0,0,0,0.08);border-color:var(--border);}
-[data-theme="apple"] .consult-card{
-  box-shadow:0 1px 4px rgba(0,0,0,0.08);border-color:var(--border);}
-[data-theme="apple"] .stat-card{
-  box-shadow:0 1px 4px rgba(0,0,0,0.06);border-color:var(--border);}
-[data-theme="apple"] .c-time{
-  background:var(--vsoft);color:var(--violet);}
-[data-theme="apple"] .c-lawyer{
-  background:var(--vsoft);color:var(--violet);}
-[data-theme="apple"] .nt.on{color:var(--violet);}
-[data-theme="apple"] .seg-btn.on{background:var(--violet);}
-[data-theme="apple"] .btn-submit{
-  background:linear-gradient(135deg,var(--violet),#7b79e8);}
-[data-theme="apple"] .field input:focus,
-[data-theme="apple"] .field textarea:focus,
-[data-theme="apple"] .field select:focus{
-  border-color:rgba(88,86,214,.4);}
-[data-theme="apple"] .toast{
-  background:#ffffff;color:#1c1c1e;
+html[data-theme="apple"] body{background:#f2f2f7 !important;color:#1c1c1e !important;}
+html[data-theme="apple"] .screen{background:#f2f2f7 !important;}
+html[data-theme="apple"] #s-login{background:linear-gradient(160deg,#ececf5 0%,#f2f2f7 65%) !important;}
+html[data-theme="apple"] .bnav{
+  background:rgba(255,255,255,0.92) !important;
+  border-top-color:rgba(0,0,0,0.12) !important;}
+html[data-theme="apple"] .task-card{
+  background:#ffffff !important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);border-color:rgba(0,0,0,0.09);}
+html[data-theme="apple"] .consult-card{
+  background:#ffffff !important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);border-color:rgba(0,0,0,0.09);}
+html[data-theme="apple"] .stat-card{
+  background:#ffffff !important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.09);}
+html[data-theme="apple"] .pin-display,
+html[data-theme="apple"] .pin-key,
+html[data-theme="apple"] .seg,
+html[data-theme="apple"] .field input,
+html[data-theme="apple"] .field textarea,
+html[data-theme="apple"] .field select{background:#ffffff !important;color:#1c1c1e !important;}
+html[data-theme="apple"] .c-time{
+  background:rgba(88,86,214,0.11) !important;color:#5856d6 !important;}
+html[data-theme="apple"] .c-lawyer{
+  background:rgba(88,86,214,0.11) !important;color:#5856d6 !important;}
+html[data-theme="apple"] .nt.on{color:#5856d6 !important;}
+html[data-theme="apple"] .seg-btn.on{background:#5856d6 !important;}
+html[data-theme="apple"] .toast{
+  background:#ffffff !important;color:#1c1c1e !important;
   box-shadow:0 4px 20px rgba(0,0,0,0.12);}
 </style>
 </head>

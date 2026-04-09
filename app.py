@@ -480,7 +480,10 @@ def dashboard():
 
 @app.route("/app", methods=["GET"])
 def pwa_app():
-    return send_file("lexdesk-app/index.html")
+    response = send_file("lexdesk-app/index.html")
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    return response
 
 
 @app.route("/auth/telegram", methods=["GET"])
