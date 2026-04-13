@@ -313,7 +313,7 @@ def parse_task(chat_id, lines):
         priority
     ]
 
-    ws.append_row(row, value_input_option="USER_ENTERED")
+    ws.append_row(row, value_input_option="RAW")
     row_number = len(ws.get_all_values())
     set_checkbox(TASKS_SHEET, row_number, 1)
 
@@ -350,7 +350,12 @@ def parse_consult(chat_id, lines):
     subject = lines[3] if len(lines) > 3 else ""
     lawyer = lines[4] if len(lines) > 4 else ""
 
-    ws = get_worksheet(CONSULTS_SHEET)
+    try:
+        ws = get_worksheet(CONSULTS_SHEET)
+    except Exception as e:
+        app.logger.exception("Консультации: лист не найден")
+        send_message(chat_id, f"❌ Ошибка: лист «{CONSULTS_SHEET}» не найден в таблице.\n{e}")
+        return
 
     row = [
         fio,
@@ -361,7 +366,13 @@ def parse_consult(chat_id, lines):
         lawyer,
     ]
 
-    ws.append_row(row, value_input_option="USER_ENTERED")
+    try:
+        ws.append_row(row, value_input_option="USER_ENTERED")
+    except Exception as e:
+        app.logger.exception("Консультации: ошибка записи в таблицу")
+        send_message(chat_id, f"❌ Ошибка записи в таблицу: {e}")
+        return
+
     row_number = len(ws.get_all_values())
 
     add_calendar_event(date, tm, fio, phone, subject, lawyer, chat_id)
