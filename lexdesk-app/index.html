@@ -25,6 +25,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
   font-size:15px;overflow:hidden;}
 
+/* ── PHONE FRAME (desktop only) ── */
+@media (min-width:481px){
+  body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;}
+  #phone-frame{
+    position:relative;
+    width:390px;height:844px;
+    border-radius:44px;
+    overflow:hidden;
+    transform:translateZ(0);
+    box-shadow:0 0 0 10px #2a2a3e,0 30px 80px rgba(0,0,0,0.7);
+    flex-shrink:0;
+  }
+}
+@media (max-width:480px){
+  #phone-frame{height:100svh;}
+}
+
 /* ── SCREENS ── */
 .screen{position:fixed;inset:0;display:none;flex-direction:column;background:var(--bg);}
 .screen.active{display:flex;}
@@ -270,6 +287,7 @@ html[data-theme="apple"] .toast{
 </style>
 </head>
 <body>
+<div id="phone-frame">
 
 <!-- ══════════════════════════════════
      SCREEN: LOGIN
@@ -1219,5 +1237,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 </script>
+</div><!-- /phone-frame -->
 </body>
 </html>
