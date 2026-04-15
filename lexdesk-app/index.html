@@ -827,15 +827,16 @@ function renderMyTasks() {
   const tod   = tasks.filter(t => parseDate(t['Срок исполнения'])?.toDateString() === today.toDateString());
   const soon  = tasks.filter(t => { const d = parseDate(t['Срок исполнения']); return d && d > today && d.toDateString() !== today.toDateString(); });
 
+  const todConsults = isAdmin ? allConsults.filter(c => parseDate(c['Дата'])?.toDateString() === today.toDateString()) : [];
+
   document.getElementById('st-over').textContent  = over.length;
-  document.getElementById('st-today').textContent = tod.length;
+  document.getElementById('st-today').textContent = tod.length + todConsults.length;
   document.getElementById('st-soon').textContent  = soon.length;
 
   let html = '';
 
   // Сегодняшние консультации (для admin)
   if (isAdmin) {
-    const todConsults = allConsults.filter(c => parseDate(c['Дата'])?.toDateString() === today.toDateString());
     if (todConsults.length) {
       html += `<div class="sec"><h3>📅 Консультации сегодня</h3><span class="sec-count">${todConsults.length}</span></div>`;
       todConsults.forEach(c => {
