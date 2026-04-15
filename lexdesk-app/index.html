@@ -204,6 +204,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   cursor:pointer;margin-top:8px;box-shadow:0 8px 32px rgba(124,58,237,.3);}
 .btn-submit:active{transform:scale(.98);}
 .btn-submit:disabled{opacity:.5;cursor:not-allowed;}
+.client-msg-box{display:none;margin-top:12px;background:rgba(16,185,129,0.1);
+  border:1px solid rgba(16,185,129,0.35);border-radius:var(--r);padding:14px;}
+.client-msg-text{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:12px;
+  white-space:pre-wrap;word-break:break-word;}
+.btn-copy{width:100%;padding:14px;background:linear-gradient(135deg,#2481cc,#1a6baa);
+  border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;
+  cursor:pointer;transition:transform .1s;}
+.btn-copy:active{transform:scale(.97);}
+.btn-copy.copied{background:linear-gradient(135deg,var(--emerald),#059669);}
 
 /* ══════════════════════════════════
    FILTERS
@@ -464,6 +473,10 @@ html[data-theme="apple"] .toast{
         </select>
       </div>
       <button class="btn-submit" id="submit-consult" onclick="submitConsult()">Записать консультацию →📅</button>
+      <div class="client-msg-box" id="client-msg-box">
+        <div class="client-msg-text" id="client-msg-text"></div>
+        <button class="btn-copy" id="btn-copy" onclick="copyClientMsg()">📋 Скопировать для клиента</button>
+      </div>
     </div>
   </div>
 
@@ -1020,10 +1033,18 @@ async function submitConsult() {
     const data = await res.json();
     if (data.ok) {
       showToast('✅ Консультация записана + добавлена в Календарь');
-      document.getElementById('f-fio').value = '';
-      document.getElementById('f-phone').value = '';
-      document.getElementById('f-subject').value = '';
-      document.getElementById('f-clawyer').value = '';
+      // Формируем текст для клиента
+      const firstName = fio.split(' ')[0];
+      const timeStr = ctime ? ' в ' + ctime : '';
+      let msg = `Уважаемый(ая) ${firstName}, вы записаны на консультацию ${dateFormatted}${timeStr}.`;
+      if (subject) msg += `\nВопрос: ${subject}.`;
+      msg += `\nАдвокат: ${lawyer}.\nАдвокатский кабинет LexDesk.`;
+      document.getElementById('client-msg-text').textContent = msg;
+      const box = document.getElementById('client-msg-box');
+      box.style.display = 'block';
+      const copyBtn = document.getElementById('btn-copy');
+      copyBtn.className = 'btn-copy';
+      copyBtn.textContent = '📋 Скопировать для клиента';
     } else {
       showToast('❌ Ошибка: ' + data.error);
     }
@@ -1032,6 +1053,38 @@ async function submitConsult() {
   }
   btn.disabled = false;
   btn.innerHTML = 'Записать консультацию →📅';
+}
+
+function copyClientMsg() {
+  const text = document.getElementById('client-msg-text').textContent;
+  const copyBtn = document.getElementById('btn-copy');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+  copyBtn.classList.add('copied');
+  copyBtn.textContent = '✅ Скопировано!';
+  setTimeout(() => {
+    document.getElementById('client-msg-box').style.display = 'none';
+    document.getElementById('f-fio').value = '';
+    document.getElementById('f-phone').value = '';
+    document.getElementById('f-cdate').value = '';
+    document.getElementById('f-ctime').value = '';
+    document.getElementById('f-subject').value = '';
+    document.getElementById('f-clawyer').value = '';
+  }, 3000);
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
 }
 
 // ════════════════════════════════════
